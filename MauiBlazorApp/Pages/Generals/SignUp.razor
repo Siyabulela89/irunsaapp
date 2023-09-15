@@ -1,0 +1,82 @@
+﻿@page "/pages/sign-up"
+@using irunsaapp.Models;
+@using irunsaapp.Services;
+
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<MudPaper Elevation="3" Height="150" Class="px-4 mx-n4 mt-n10 pt-10 mud-theme-primary" Style="border-radius: 0px 0px 45px 45px;" Outlined="false">
+    <MudPaper Elevation="0" Class="py-6" Style="background-color: transparent">
+
+    </MudPaper>
+</MudPaper>
+
+<MudGrid Class="mt-n15 pt-0">
+    <MudItem xs="12">
+         <EditForm Model="RegisterModel" OnValidSubmit="HandleRegistration">
+        <MudCard Elevation="1" Class="rounded-lg py-1">
+            <MudCardContent>
+                <MudText Color="Color.Default" Typo="Typo.h6" Style="font-weight: 600;">Sign Up</MudText>
+                <MudText Class="mb-5" Typo="Typo.body2">Get started in minutes</MudText>
+
+                    @if (ShowErrors)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @foreach (var error in Errors!)
+                            {
+                                <p>@error</p>
+                            }
+                        </div>
+                    }
+
+
+                <MudTextField Class="mt-3" T="string" Label="Email" Id="email" @bind-Value="RegisterModel.Email" Variant="Variant.Filled" Margin="Margin.Dense"
+                              AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AlternateEmail" />
+                <ValidationMessage For="@(() => RegisterModel.Email)" />
+                
+                <MudTextField Class="mt-3" Label="Password" Id="password" type="password"  @bind-Value="RegisterModel.Password" Variant="Variant.Filled" Margin="Margin.Dense"
+                              T="string" AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.Lock" />
+                <ValidationMessage For="@(() => RegisterModel.Password)" />
+                <MudTextField Class="mt-3" Label="Confirm Password" Id="password" type="password" @bind-Value="RegisterModel.ConfirmPassword" Variant="Variant.Filled" Margin="Margin.Dense"
+                              T="string" AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.Lock" />
+                <ValidationMessage For="@(() => RegisterModel.ConfirmPassword)" />
+
+                    <MudButton Class="my-4 py-2 rounded-lg" ButtonType="ButtonType.Submit" Color="Color.Tertiary" FullWidth="true" Variant="Variant.Filled"> Creat Account </MudButton>
+                  
+                <div class="d-flex justify-center my-5">
+                    <MudLink Href="/pages/sign-in" Typo="Typo.body2">Already Registered? Sign in</MudLink>
+                </div>
+
+                <MudButton Class="my-1 py-2 rounded-lg" Color="Color.Primary" DisableElevation FullWidth="true" StartIcon="fab fa-facebook" Variant="Variant.Filled"> Register with Facebook </MudButton>
+                <MudButton Class="my-1 py-2 rounded-lg" Color="Color.Error" DisableElevation FullWidth="true" StartIcon="fab fa-google" Variant="Variant.Filled"> Register with Google </MudButton>
+                <MudButton Class="my-1 py-2 rounded-lg" Color="Color.Default" DisableElevation FullWidth="true" StartIcon="fab fa-apple" Variant="Variant.Filled"> Register with Apple </MudButton>
+            </MudCardContent>
+        </MudCard>
+        </EditForm>
+    </MudItem>
+</MudGrid>
+
+                @code {
+
+    private RegisterModel RegisterModel = new RegisterModel();
+    private bool ShowErrors;
+    private IEnumerable<string>? Errors;
+
+    private async Task HandleRegistration()
+    {
+        ShowErrors = false;
+
+        var result = await AuthService.Register(RegisterModel);
+
+        if (result.Successful)
+        {
+            NavigationManager.NavigateTo("/pages/sign-in");
+        }
+        else
+        {
+            Errors = result.Errors;
+            ShowErrors = true;
+        }
+    }
+
+}

@@ -1,0 +1,335 @@
+﻿@page "/components"
+
+@if (!_loaded)
+{
+    <Spinner></Spinner>
+}
+else
+{
+<MudGrid Class="mt-5 pt-0 mb-1">
+    <MudItem xs="12">
+        <MudCard Elevation="1" Class="">
+            <MudCardContent>
+                <MudText Color="Color.Default" Typo="Typo.subtitle1" Style="font-weight: 500;">What are Components?</MudText>
+                <MudText Color="Color.Default" Align="Align.Left" Typo="Typo.body2">Components are the founding elements of BlazorStore, and shared among all of them, with unique pages to match the style of the product.</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+<MudCard Elevation="1" Class=" mb-5">
+    <MudCardContent>
+        <MudGrid Spacing="0">
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToAlertComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.ModeComment" Color="Color.Secondary" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Alert </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToAvatarComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.AccountCircle" Color="Color.Info" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Avatar </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToBadgeComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.Brightness1" Color="Color.Tertiary" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Badge </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToButtonsComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.SmartButton" Color="Color.Primary" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Buttons </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToCardComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.CreditCard" Color="Color.Secondary" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Cards </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToCarouselComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.Image" Color="Color.Warning" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Carousel </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToChartsComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.PieChart" Color="Color.Info" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Charts </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToChipsComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.Crop169" Color="Color.Primary" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Chips </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToDialogComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.MarkChatUnread" Color="Color.Warning" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Dialog </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToExpansionPanelComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.HorizontalSplit" Color="Color.Secondary" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Expansion Panel </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToFileUploadComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.CloudUpload" Color="Color.Success" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> File Upload </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToFormInputsComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.DynamicForm" Color="Color.Primary" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Form Inputs </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToListComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.ListAlt" Color="Color.Secondary" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> List </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToPickersComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.ArrowDropDownCircle" Color="Color.Warning" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Pickers </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToProgressComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.Timeline" Color="Color.Tertiary" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Progress </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToSkeletonComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.Downloading" Color="Color.Secondary" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Skeleton </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToTimelineComponent())">
+                    <MudIconButton Icon="@Icons.TwoTone.ViewTimeline" Color="Color.Warning" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Timeline </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="0" Class="d-flex flex-row " Style="background-color: transparent" @onclick="@(() => NavigateToTypographyComponent())">
+                        <MudIconButton Icon="@Icons.TwoTone.FormatColorText" Color="Color.Default" Class="mx-0 my-5 align-self-center" Size="Size.Small" Variant="Variant.Filled"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="mx-3 align-self-center" Color="@Color.Default"> Typography </MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" Class="mr-2 ml-auto align-self-center" Size="Size.Medium"></MudIcon>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+
+}
+@code {
+    private bool _loaded;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(1000);
+        _loaded = true;
+    }
+
+    public void NavigateToAlertComponent()
+    {
+        _navigationManager.NavigateTo("/components/alert");
+    }
+    public void NavigateToAvatarComponent()
+    {
+        _navigationManager.NavigateTo("/components/avatar");
+    }
+
+    public void NavigateToBadgeComponent()
+    {
+        _navigationManager.NavigateTo("/components/badge");
+    }
+
+    public void NavigateToButtonsComponent()
+    {
+        _navigationManager.NavigateTo("/components/buttons");
+    }
+
+    public void NavigateToCardComponent()
+    {
+        _navigationManager.NavigateTo("/components/cards");
+    }
+
+    public void NavigateToCarouselComponent()
+    {
+        _navigationManager.NavigateTo("/components/carousel");
+    }
+
+    public void NavigateToChartsComponent()
+    {
+        _navigationManager.NavigateTo("/components/charts");
+    }
+
+    public void NavigateToChipsComponent()
+    {
+        _navigationManager.NavigateTo("/components/chips");
+    }
+
+    public void NavigateToDialogComponent()
+    {
+        _navigationManager.NavigateTo("/components/dialog");
+    }
+    public void NavigateToExpansionPanelComponent()
+    {
+        _navigationManager.NavigateTo("/components/expansion");
+    }
+
+    public void NavigateToFileUploadComponent()
+    {
+        _navigationManager.NavigateTo("/components/file-upload");
+    }
+
+    public void NavigateToFormInputsComponent()
+    {
+        _navigationManager.NavigateTo("/components/form-inputs");
+    }
+
+    public void NavigateToListComponent()
+    {
+        _navigationManager.NavigateTo("/components/list");
+    }
+
+    public void NavigateToPickersComponent()
+    {
+        _navigationManager.NavigateTo("/components/pickers");
+    }
+
+    public void NavigateToProgressComponent()
+    {
+        _navigationManager.NavigateTo("/components/progress");
+    }
+
+    public void NavigateToSkeletonComponent()
+    {
+        _navigationManager.NavigateTo("/components/skeleton");
+    }
+
+    public void NavigateToTimelineComponent()
+    {
+        _navigationManager.NavigateTo("/components/timeline");
+    }
+
+    public void NavigateToTypographyComponent()
+    {
+        _navigationManager.NavigateTo("/components/typography");
+    }
+}
