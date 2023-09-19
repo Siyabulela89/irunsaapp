@@ -11,11 +11,11 @@ namespace irunsaapp.Models
         public int LicenseTypeId { get; set; }
         public int LicenseCode { get; set; }
         public int Year { get; set; }
-        public int DashboardId { get; set; }
-        public int DashboardEntiyId { get; set; }
+        public int EntityTypeId { get; set; }
+        public int EntityTypeEntiyId { get; set; }
         public bool LicenseStatus { get; set; }
-        public int TransferDashboardId { get; set; }
-        public int TransferDashboardEntiyId { get; set; }
+        public int TransferEntityTypeId { get; set; }
+        public int TransferEntityTypeEntiyId { get; set; }
         public int CreatedByUserId { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace irunsaapp.Services
 {
-    public interface IDashboardType
+    public interface IEntityType
     {
-        Task<List<EntityType>> GetAllDashboardlist();
+        Task<List<EntityType>> GetAllEntityTypelist();
         Task<List<Country>> GetallCountries();
         Task<AthleteEntity> AddathleteEntity(AthleteEntity AthleteEntity);
     }

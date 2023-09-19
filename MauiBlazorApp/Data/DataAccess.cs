@@ -19,7 +19,7 @@ namespace irunsaapp.Data
 
         public async Task<string> GetForecastAsync()
         {
-            var url = "https://irunsa.co.za/api/Dashboard/GetAll";
+            var url = "https://irunsa.co.za/api/EntityType/GetAll";
 
             try
             {

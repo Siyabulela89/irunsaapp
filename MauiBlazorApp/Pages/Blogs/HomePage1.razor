@@ -1,7 +1,7 @@
 ﻿@page "/blogs-home1"
 @using irunsaapp.Services
 @using irunsaapp.Models
-@inject IDashboardType DashboardTypeService
+@inject IEntityType EntityTypeService
 
 
 <style>
@@ -77,7 +77,7 @@ else
     <MudGrid Class="mt-n15 pt-0 mb-1">
         <MudItem xs="12">
             <div class="hz-container px-1 py-2">
-                @foreach (var dasht in _Dashboardlist)
+                @foreach (var dasht in _EntityTypelist)
                 {
                 <MudCard Elevation="0" Class="mr-5 mud-theme-primary rounded-lg card-style">
                     <MudCardContent Class="d-flex flex-column justify-space-between card-style-1" Style="height: 350px; width: 310px;">
@@ -393,12 +393,12 @@ else
 
 
 
-    List<EntityType> _Dashboardlist;
+    List<EntityType> _EntityTypelist;
     protected override async Task OnInitializedAsync()
     {
      
    
-        _Dashboardlist = await DashboardTypeService.GetAllDashboardlist();
+        _EntityTypelist = await EntityTypeService.GetAllEntityTypelist();
    
         _loaded = true;
     

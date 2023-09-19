@@ -7,11 +7,11 @@ using irunsaapp.Models;
 
 namespace irunsaapp.Services
 {
-    public class DashboardService : IDashboardType
+    public class EntityTypeService : IEntityType
     {
         private readonly HttpClient _httpClient;
 
-        public DashboardService(HttpClient httpClient)
+        public EntityTypeService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -53,7 +53,7 @@ namespace irunsaapp.Services
                 throw new ApplicationException("Failed to get countries list.", ex);
 }}
         
-        public async Task<List<EntityType>> GetAllDashboardlist()
+        public async Task<List<EntityType>> GetAllEntityTypelist()
         {
             try
             {
@@ -63,7 +63,7 @@ namespace irunsaapp.Services
             catch (Exception ex)
             {
                 // Handle the exception (log, rethrow, etc.)
-                throw new ApplicationException("Failed to get dashboard list.", ex);
+                throw new ApplicationException("Failed to get EntityType list.", ex);
             }
         }
     }
