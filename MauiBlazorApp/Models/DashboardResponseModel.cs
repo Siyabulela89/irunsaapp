@@ -9,10 +9,11 @@ namespace irunsaapp.Models
   
 
 
-    public class DashboardResponseModel
+    public class EntityTypeResponseModel
     {
-        public int dashboardId { get; set; }
-        public string dashboardDescription { get; set; }
+        public int entityTypeId { get; set; }
+        public string entityTypeDescription { get; set; }
+
     }
 
 }

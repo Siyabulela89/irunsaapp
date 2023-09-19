@@ -82,26 +82,26 @@ else
                 <MudCard Elevation="0" Class="mr-5 mud-theme-primary rounded-lg card-style">
                     <MudCardContent Class="d-flex flex-column justify-space-between card-style-1" Style="height: 350px; width: 310px;">
                         <div class="d-flex justify-space-between">
-                            @if(dasht.dashboardId==1)
+                            @if(dasht.EntityTypeId==1)
                             {
-                                <MudChip Color="Color.Tertiary" Label="true" Size="Size.Small">@dasht.dashboardDescription</MudChip>
+                                <MudChip Color="Color.Tertiary" Label="true" Size="Size.Small">@dasht.EntityTypeDescription</MudChip>
                                     <MudIconButton Icon="@Icons.Material.TwoTone.Favorite" Color="Color.Secondary" />
                                 }
-                                else if(dasht.dashboardId==2)
+                                else if (dasht.EntityTypeId == 2)
                                 {
-                                       <MudChip Color="Color.Primary" Label="true" Size="Size.Small">@dasht.dashboardDescription</MudChip>
+                                       <MudChip Color="Color.Primary" Label="true" Size="Size.Small">@dasht.EntityTypeDescription</MudChip>
                                     <MudIconButton Icon="@Icons.Material.TwoTone.Favorite" Color="Color.Secondary" />
 
                                 }
                                 else
 
                                 {
-                                    <MudChip Color="Color.Tertiary" Label="true" Size="Size.Small">@dasht.dashboardDescription</MudChip>
+                                    <MudChip Color="Color.Tertiary" Label="true" Size="Size.Small">@dasht.EntityTypeDescription</MudChip>
                                     <MudIconButton Icon="@Icons.Material.TwoTone.Favorite" Color="Color.Secondary" />
                                 }
                             </div>
                             <div>
-                                <MudText Typo="Typo.h6" Style="font-weight: 500; line-height: 1.2">@dasht.dashboardDescription</MudText>
+                                <MudText Typo="Typo.h6" Style="font-weight: 500; line-height: 1.2">@dasht.EntityTypeDescription</MudText>
                                 <div class="d-flex justify-space-between mt-2">
                                     <div class="d-flex">
                                         <MudAvatar Image="/images/pictures/faces/3s.png" Style="height: 30px; width: 30px;"> </MudAvatar>
@@ -393,7 +393,7 @@ else
 
 
 
-    List<DashboardResponseModel> _Dashboardlist;
+    List<EntityType> _Dashboardlist;
     protected override async Task OnInitializedAsync()
     {
      
@@ -404,7 +404,7 @@ else
     
 
 
-        //var request = new HttpRequestMessage(HttpMethod.Get, "https://irunsa.co.za/api/Dashboard/GetAll")
+  
 
     }
  }

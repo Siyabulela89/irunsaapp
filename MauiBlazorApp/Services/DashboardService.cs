@@ -53,12 +53,12 @@ namespace irunsaapp.Services
                 throw new ApplicationException("Failed to get countries list.", ex);
 }}
         
-        public async Task<List<DashboardResponseModel>> GetAllDashboardlist()
+        public async Task<List<EntityType>> GetAllDashboardlist()
         {
             try
             {
-                var response = await _httpClient.GetStringAsync("api/Dashboard/GetAll");
-                return JsonSerializer.Deserialize<List<DashboardResponseModel>>(response);
+                var response = await _httpClient.GetStringAsync("api/EntityType/GetAll");
+                return JsonSerializer.Deserialize<List<EntityType>>(response);
             }
             catch (Exception ex)
             {

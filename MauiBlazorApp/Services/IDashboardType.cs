@@ -10,7 +10,7 @@ namespace irunsaapp.Services
 {
     public interface IDashboardType
     {
-        Task<List<DashboardResponseModel>> GetAllDashboardlist();
+        Task<List<EntityType>> GetAllDashboardlist();
         Task<List<Country>> GetallCountries();
         Task<AthleteEntity> AddathleteEntity(AthleteEntity AthleteEntity);
     }
