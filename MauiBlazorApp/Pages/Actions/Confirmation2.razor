@@ -1,0 +1,34 @@
+﻿<MudDialog Class="ma-3 py-5 rounded-lg">
+    <TitleContent>
+    </TitleContent>
+    <DialogContent>
+        <MudPaper Elevation="0" Class="d-flex flex-column gap-3 justify-center">
+            <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Default" Style="font-weight: 600">I can only proceed if:</MudText>
+            <MudText Align="Align.Center" Typo="Typo.body2" Class="">1. I am acting as a Legal Gaurdian for an Athlete(s) who is under the age of 18 years, Or </MudText>
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+        
+            </MudItem>
+            <MudText Align="Align.Center" Typo="Typo.body2" Class="">2. I am the Athlete(s) Representative/Manager, And</MudText>
+            <MudItem xs="12" sm="12" md="12">
+                <MudDivider></MudDivider>
+      
+            </MudItem>
+            <MudText Align="Align.Center" Typo="Typo.body2" Class="">3. I myself am over the age of 18 years</MudText>
+        </MudPaper>
+        <div class="mt-5 d-flex flex-grow-1 gap-4">
+            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Proceed</MudButton>
+            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="Cancel">Cancel</MudButton>
+        </div>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+    void Cancel() => MudDialog.Cancel();
+}

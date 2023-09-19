@@ -2,7 +2,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JsRuntime
 
-<MudThemeProvider Theme="_themeManager.Theme"/>
+<MudThemeProvider @bind-IsDarkMode="@themeon"/>
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -13,29 +13,51 @@
     <MudAppBar Elevation="_themeManager.AppBarElevation">
         @if(Navigation.Uri.Substring(Navigation.BaseUri.Length) != "")
         {
-            <MudIconButton Href="back" Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Inherit" Edge="Edge.Start" />
+            <MudIconButton Href="back" Icon="@Icons.Material.Filled.ArrowBack" label="back"  Color="Color.Inherit" Edge="Edge.Start" >Back</MudIconButton>
         }
-             
+        
+<AuthorizeView>
+    <NotAuthorized>
+                <MudButtonGroup Color="Color.Info" Size="Size.Small" Variant="Variant.Text">
+                    <MudButton Href="/pages/sign-in" StartIcon="@Icons.Material.Filled.Login" IconColor="Color.Info">Login</MudButton>
+                    <MudButton Href="/pages/sign-up" StartIcon="@Icons.Material.Filled.AppRegistration" IconColor="Color.Info">Register</MudButton>
+                  
+                </MudButtonGroup>
+          
+                @*<MudButton Variant="Variant.Text" Icon="@Icons.Material.Filled.Person" Href="/pages/sign-in" Color="Color.Secondary">Login</MudButton>
+                <MudButton Variant="Variant.Text" Icon="@Icons.Material.Filled.Person2" Href="/pages/sign-up" Color="Color.Secondary">Registration</MudButton>*@
+@*                <MudFab Color="Color.Primary" Href="/pages/sign-in" Icon="@Icons.Material.Filled.Person" Size="Size.Small" IconSize="Size.Small" Label="Login" Class="ma-2" />
+                <MudFab Color="Color.Primary" Href="/pages/sign-up" Icon="@Icons.Material.Filled.Person" Size="Size.Small" IconSize="Size.Small" Label="Register" Class="ma-2" />*@
+    </NotAuthorized>
+         <Authorized>
+         
+                  <MudButtonGroup Color="Color.Info" Size="Size.Small" Variant="Variant.Text">
+                <MudButton Href="/pages/logout" StartIcon="@Icons.Material.Filled.Logout" Style="@($"color:{Colors.Cyan.Accent3};")">Logout</MudButton>
+                </MudButtonGroup>
+            
+            
+         </Authorized>
+         </AuthorizeView>
         <MudSpacer />
-
-        <MudIconButton Icon="@Icons.Material.TwoTone.Palette" Color="Color.Inherit" OnClick="@((e) => OpenThemeManager(true))" />
-        <MudIconButton Icon="@Icons.Material.TwoTone.Notifications" Color="Color.Inherit" Href="/" Target="_blank" />
+   
+   @*     <MudIconButton Icon="@Icons.Material.TwoTone.Palette" Color="Color.Inherit" OnClick="@((e) => OpenThemeManager(true))" />*@
+   @*     <MudIconButton Icon="@Icons.Material.TwoTone.Notifications" Color="Color.Inherit" Href="/" Target="_blank" />*@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" />
     </MudAppBar>
 
     <MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.Right" Class="rounded-t-l-lg rounded-b-l-lg" ClipMode="_themeManager.DrawerClipMode" Elevation="_themeManager.DrawerElevation" Variant="@DrawerVariant.Responsive">
         <MudDrawerHeader Class="pa-0">
             <MudCard Elevation="0" Class="pa-0" Square="true" Style="background-color: transparent">
-                <MudCardContent Class="d-flex flex-column justify-start py-3">
-                    <MudImage Src="/images/logo.svg" Style="height: auto; width: 100%" />
-                    <MudText Align="Align.Center" Typo="Typo.subtitle1" Class="mt-3" Style="font-weight: 500;" Color="Color.Default">Multi-platform UI Kit</MudText>
-                    <MudChip Class="align-self-center" Color="Color.Error" Size="Size.Small">v2.0</MudChip>
+                <MudCardContent Class="d-flex flex-column justify-start ">
+                    <MudImage Src="/images/irunsa.svg" Style="height: auto; width: 100%" />
+             
+                    <MudChip Class="align-self-center" Color="Color.Info" Size="Size.Small">v1.0</MudChip>
                 </MudCardContent>
             </MudCard>
         </MudDrawerHeader>
         <NavMenu />
     </MudDrawer>
-
+ 
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.Large" Class="mt-5 mb-15 pt-0 pb-8">
             @Body
@@ -60,6 +82,7 @@
     public bool _themeManagerOpen = false;
     bool _drawerOpen = true;
     const string RouteBack = "/back";
+    bool themeon = true;
 
     void OpenThemeManager(bool value)
     {

@@ -1,4 +1,5 @@
 ﻿using irunsaapp.Models;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,7 @@ namespace irunsaapp.Services
     public interface IDashboardType
     {
         Task<List<DashboardResponseModel>> GetAllDashboardlist();
+        Task<List<Country>> GetallCountries();
+        Task<AthleteEntity> AddathleteEntity(AthleteEntity AthleteEntity);
     }
 }

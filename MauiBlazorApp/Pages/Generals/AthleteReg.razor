@@ -1,0 +1,180 @@
+﻿@page "/AthReg"
+@using Newtonsoft.Json;
+@using irunsaapp.Models
+@using irunsaapp.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject HttpClient httpClient
+
+
+@inject IDashboardType Dashboard
+@inject NavigationManager NavigationManager
+
+<MudPaper Elevation="3" Height="150" Class="px-4 mx-n4 mt-n10 pt-10 mud-theme-primary" Style="border-radius: 0px 0px 45px 45px;" Outlined="false">
+    <MudPaper Elevation="0" Class="py-6" Style="background-color: transparent">
+
+    </MudPaper>
+</MudPaper>
+
+<MudGrid Class="mt-n15 pt-0">
+    <MudItem xs="12">
+        <EditForm Model="athleteEntity" OnValidSubmit="HandleAthleteReg">
+            <MudCard Elevation="1" Class="rounded-lg py-1">
+                <MudCardContent>
+                    <MudText Color="Color.Default" Typo="Typo.h6" Style="font-weight: 600;">Sign Up</MudText>
+                    <MudText Class="mb-5" Typo="Typo.body2">Let's go</MudText>
+
+                    @if (ShowErrors)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @foreach (var error in Errors!)
+                            {
+                                <p>@error</p>
+                            }
+                        </div>
+                    }
+
+                    <MudTextField  T="string" Label="Name" Id="Name" @bind-Value="athleteEntity.AthleteName" Variant="Variant.Outlined"
+                                  Adornment="Adornment.End" />
+                    <ValidationMessage For="@(() => athleteEntity.AthleteName)" />
+                    <MudTextField T="string" Label="Surname" Id="Surname" @bind-Value="athleteEntity.AthleteSurname" Variant="Variant.Outlined"
+                                  Adornment="Adornment.End" />
+                    <ValidationMessage For="@(() => athleteEntity.AthleteSurname)" />
+
+                    <MudTextField DebounceInterval="1" OnDebounceIntervalElapsed="HandleIntervalElapsed" @bind-Value="selectedcountryname" HelperText="@searchTerm" Label="Country of nationality" Variant="Variant.Outlined" Adornment="Adornment.End" />
+                    
+                    @if (searchResults != null)
+                    {
+                        <MudSimpleTable Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Style="overflow-x: auto;">
+                          
+                            <tbody>
+                                @if (searchResults.Any())
+                                {
+                                @foreach (var country in searchResults)
+                                {
+                                  
+                                        <tr @onclick=@(_ => SelectCountry(country.CountryID,country.CountryName))>
+
+                                            <td style="text-align:left">@($"{country.CountryName}")</td>
+                                            <td style="text-align:right"> <img width="30" src="@($"Countries/{country.Shortcodeflag}")" alt="Country Flag" /></td>
+
+                                        </tr>
+                                  
+
+                            }
+                                }
+                                else
+
+                                {
+                                    <MudAlert Severity="Severity.Error">Invalid Country please retype</MudAlert>
+                                }
+                            </tbody>
+                        </MudSimpleTable>
+                      
+                    }
+
+              
+                    
+                    <MudTextField T="string" Label="ID/Passport" Id="IDPssport" @bind-Value="athleteEntity.ID_Passport" Variant="Variant.Outlined"
+                                  Adornment="Adornment.End" />
+                    <ValidationMessage For="@(() => athleteEntity.ID_Passport)" />
+                    <MudDatePicker Label="Date of Birth" Editable="true" @bind-Date="athleteEntity.DOB"  Placeholder="Select Date" />
+              
+                    <ValidationMessage For="@(() => athleteEntity.DOB)" />
+
+
+               
+        
+
+                    <MudTextField Class="mt-3" T="int?" Label="Club Entity ID" Id="ClubEntityId" @bind-Value="athleteEntity.ClubEntityId" Variant="Variant.Filled" Margin="Margin.Dense"
+                                  AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle" />
+                    <ValidationMessage For="@(() => athleteEntity.ClubEntityId)" />
+
+                    <MudTextField Class="mt-3" T="string" Label="Email" Id="email" InputType="InputType.Email" @bind-Value="athleteEntity.Email" Variant="Variant.Filled" Margin="Margin.Dense"
+                                  AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AlternateEmail" />
+                    <ValidationMessage For="@(() => athleteEntity.Email)" />
+                    
+                    <MudButton Class="my-4 py-2 rounded-lg" ButtonType="ButtonType.Submit" Color="Color.Tertiary" FullWidth="true" Variant="Variant.Filled">Create Account</MudButton>
+
+                    <div class="d-flex justify-center my-5">
+                        <MudLink Href="/pages/sign-in" Typo="Typo.body2">Already Registered? Sign in</MudLink>
+                    </div>
+
+                    <MudButton Class="my-1 py-2 rounded-lg" Color="Color.Primary" DisableElevation FullWidth="true" StartIcon="fab fa-facebook" Variant="Variant.Filled">Register with Facebook</MudButton>
+                    <MudButton Class="my-1 py-2 rounded-lg" Color="Color.Error" DisableElevation FullWidth="true" StartIcon="fab fa-google" Variant="Variant.Filled">Register with Google</MudButton>
+                    <MudButton Class="my-1 py-2 rounded-lg" Color="Color.Default" DisableElevation FullWidth="true" StartIcon="fab fa-apple" Variant="Variant.Filled">Register with Apple</MudButton>
+                    </MudCardContent>
+                    </MudCard>
+                    </EditForm>
+                    </MudItem>
+                    </MudGrid>
+
+                    @code {
+    private AthleteEntity athleteEntity = new AthleteEntity();
+    private bool ShowErrors;
+    private IEnumerable<string>? Errors;
+    private string searchTerm;
+    private List<Country> searchResults;
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = false;
+    private bool bordered = false;
+    int? selectedcountryid;
+    string? selectedcountryname;
+    public DateTime? DOB { get; set; }
+    DateTime? date = DateTime.Today;
+    //private Task OnSearchInput(ChangeEventArgs e)
+    //{
+    //    searchTerm = e.Value.ToString();
+
+    //    // Call your search function here and update searchResults
+    //    searchResults =  Search(searchTerm);
+
+    //}
+    void HandleIntervalElapsed(string debouncedText)
+    {
+
+
+        // Call your search function here and update searchResults
+        searchResults = Search(debouncedText);
+        // at this stage, interval has elapsed
+    }
+    private List<Country> Search(string value)
+    {
+        var responseTask = httpClient.GetStringAsync($"api/Country/Autocomplete/{value}");
+        responseTask.Wait(); // Blocking call, which should be used with caution
+
+        if (responseTask.IsCompletedSuccessfully)
+        {
+            var response = responseTask.Result;
+            return JsonConvert.DeserializeObject<List<Country>>(response);
+        }
+        else
+        {
+            throw new Exception("Failed to get response.");
+        }
+    }
+
+    void SelectCountry(int id, string country)
+    {
+        selectedcountryid = id;
+        selectedcountryname = country;
+        searchResults = null;
+    }
+
+    private async Task HandleAthleteReg()
+    {
+        ShowErrors = false;
+
+        // Implement your registration logic here
+        // For now, let's just display the submitted athleteEntity data
+        Console.WriteLine("Registration submitted with the following data:");
+        Console.WriteLine($"ID/Passport: {athleteEntity.ID_Passport}");
+        Console.WriteLine($"Nationality ID: {athleteEntity.NationalityID}");
+        Console.WriteLine($"Gender ID: {athleteEntity.GenderId}");
+        Console.WriteLine($"Date of Birth: {athleteEntity.DOB}");
+        Console.WriteLine($"Club Entity ID: {athleteEntity.ClubEntityId}");
+        Console.WriteLine($"Email: {athleteEntity.Email}");
+        // ... Include other fields
+    }
+}
+}

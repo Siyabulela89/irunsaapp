@@ -1,5 +1,7 @@
 ﻿@page "/pages/sign-up"
 @using irunsaapp.Models;
+
+@using irunsaapp.Pages.Actions;
 @using irunsaapp.Services;
 
 @inject IAuthService AuthService
@@ -61,21 +63,30 @@
     </MudItem>
 </MudGrid>
 
-                @code {
+
+                    @code {
 
     private RegisterModel RegisterModel = new RegisterModel();
     private bool ShowErrors;
     private IEnumerable<string>? Errors;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
 
     private async Task HandleRegistration()
     {
+        
         ShowErrors = false;
 
         var result = await AuthService.Register(RegisterModel);
 
         if (result.Successful)
         {
-            NavigationManager.NavigateTo("/pages/sign-in");
+            var options = new DialogOptions() { CloseButton = false, NoHeader = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.BottomCenter };
+            var parameters = new DialogParameters();
+            var dialog = _dialogService.Show<SuccessBox>("", parameters, options);
+
+            // Move the navigation here
+            //NavigationManager.NavigateTo("RegCat");
         }
         else
         {

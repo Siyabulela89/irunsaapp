@@ -1,0 +1,109 @@
+﻿@page "/RegCat"
+
+@inject AuthenticationStateProvider AuthState
+@using System.Security
+@using System.Security.Claims
+@using irunsaapp.Pages.Actions;
+
+@if (!_loaded)
+{
+    <Spinner></Spinner>
+}
+else
+{
+    <div class="d-flex flex-row justify-space-between mt-7 mb-2">
+        <div class="d-flex">
+            <MudIconButton Icon="fas fa-th-large" Color="Color.Primary" Size="Size.Small"></MudIconButton>
+            <MudText Color="Color.Default" Class="mx-2" Style="font-weight: 500;" Typo="Typo.h6">Categories</MudText>
+        </div>
+        <MudText Color="Color.Primary" Class="align-self-center" Typo="Typo.subtitle2">View All</MudText>
+    </div>
+    <MudGrid Class="mb-5" Spacing="2">
+        <MudItem xs="6" sm="6" md="6">
+            <MudCard Elevation="1" Class="rounded-lg" Style="height:170px;">
+                <MudCardContent Class="d-flex flex-column px-3 py-2" Style="height:170px;">
+                    <MudIconButton Icon="fas fa-user" Color="Color.Info" Class="pa-3 align-self-center" Size="Size.Large"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="align-self-center" Color="@Color.Surface">Register my own Athlete Profile</MudText>
+            
+                    <MudButtonGroup Class="mt-auto align-self-center mud-text-secondary" Color="Color.Info" Variant="Variant.Text">
+                        <MudButton StartIcon="@Icons.Material.Filled.AppRegistration" @onclick="@(() => OnActionConfirmation())" IconColor="Color.Info">Register</MudButton>
+                    </MudButtonGroup>
+               
+         
+                </MudCardContent>
+             
+            </MudCard>
+      
+        </MudItem>
+        <MudItem xs="6" sm="6" md="6">
+            <MudCard Elevation="1" Class="rounded-lg" Style="height:170px;">
+                <MudCardContent Class="d-flex flex-column px-3 py-2" Style="height:170px;">
+                    <MudIconButton Icon="fas fa-users" Color="Color.Success" Class="pa-3 align-self-center" Size="Size.Large"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="align-self-center" Color="@Color.Surface">Register on behalf of an Athlete(s)</MudText>
+                    <MudButtonGroup Class="mt-auto align-self-center mud-text-secondary" Color="Color.Success" Variant="Variant.Text">
+                        <MudButton StartIcon="@Icons.Material.Filled.AppRegistration" @onclick="@(() => OnActionConfirmation2())" IconColor="Color.Success">Register</MudButton>
+                    </MudButtonGroup>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="6" sm="6" md="6">
+            <MudCard Elevation="1" Class="rounded-lg" Style="height:170px;">
+                <MudCardContent Class="d-flex flex-column px-3 py-2" Style="height:170px;">
+                    <MudIconButton Icon="fa-solid fa-people-group" Color="Color.Warning" Class="pa-3 align-self-center" Size="Size.Large"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="align-self-center" Color="@Color.Surface">Register a Club</MudText>
+                    <MudButtonGroup Class="mt-auto align-self-center mud-text-secondary" Color="Color.Warning" Variant="Variant.Text">
+                        <MudButton StartIcon="@Icons.Material.Filled.AppRegistration" @onclick="@(() => OnActionConfirmation3())" IconColor="Color.Warning">Register</MudButton>
+                    </MudButtonGroup>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="6" sm="6" md="6">
+            <MudCard Elevation="1" Class="rounded-lg" Style="height:170px;">
+                <MudCardContent Class="d-flex flex-column px-3 py-2" Style="height:170px;">
+                    <MudIconButton Icon="fa-solid fa-photo-film" Color="Color.Secondary" Class="pa-3 align-self-center" Size="Size.Large"></MudIconButton>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="align-self-center" Color="@Color.Surface">Register as an event Photographer</MudText>
+                    <MudButtonGroup Class="mt-auto align-self-center mud-text-secondary" Color="Color.Secondary" Variant="Variant.Text">
+                        <MudButton StartIcon="@Icons.Material.Filled.AppRegistration" @onclick="@(() => OnActionConfirmation4())" IconColor="Color.Secondary">Register</MudButton>
+                    </MudButtonGroup>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
+@code {
+    public bool _loaded;
+ 
+    protected override async Task OnInitializedAsync()
+    {    
+        await Task.Delay(500);
+        _loaded = true;
+      
+    }
+
+    public void OnActionConfirmation()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions() { CloseButton = false, NoHeader = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.Center };
+        var dialog = _dialogService.Show<Confirmation>("", parameters, options);
+    }
+    public void OnActionConfirmation2()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions() { CloseButton = false, NoHeader = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.Center };
+        var dialog = _dialogService.Show<Confirmation2>("", parameters, options);
+    }
+    public void OnActionConfirmation3()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions() { CloseButton = false, NoHeader = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.Center };
+        var dialog = _dialogService.Show<Confirmation3>("", parameters, options);
+    }
+    public void OnActionConfirmation4()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions() { CloseButton = false, NoHeader = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.Center };
+        var dialog = _dialogService.Show<Confirmation4>("", parameters, options);
+    }
+ 
+}

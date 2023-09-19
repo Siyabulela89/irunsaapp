@@ -63,8 +63,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<WeatherForecastService>();
         builder.Services.AddSingleton<DataAccess>();
         builder.Services.AddSingleton<WeatherForecastService>();
-        builder.Services.AddAuthorizationCore();
         builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+        builder.Services.AddAuthorizationCore();
+   
 
 
 

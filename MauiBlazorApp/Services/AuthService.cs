@@ -10,6 +10,8 @@ using System.Net.Http;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace irunsaapp.Services
 {
@@ -81,20 +83,74 @@ namespace irunsaapp.Services
 
         public async Task<LoginResult> Login(LoginModel loginModel)
         {
-            var loginAsJson = JsonSerializer.Serialize(loginModel);
-            var response = await _httpClient.PostAsync("api/Login", new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
-            var loginResult = JsonSerializer.Deserialize<LoginResult>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return loginResult!;
+                var loginAsJson = JsonSerializer.Serialize(loginModel);
+                var response = await _httpClient.PostAsync("api/Login", new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
+
+                var loginResult = JsonSerializer.Deserialize<LoginResult>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (!response.IsSuccessStatusCode)
+                {
+                    return loginResult!;
+                }
+
+               
+
+                // Call the private method to parse claims from the JWT token
+                var claims = ParseClaimsFromJwt(loginResult.Token);
+
+                // Retrieve UserId from claims
+                var userIdClaim = claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor);
+                if (userIdClaim != null)
+                {
+                    string userId = userIdClaim.Value;
+                    loginResult.HasRoles = await CheckUserRoles(userId);
+                
+                }
+                await _localStorage.SetItemAsync("authToken", loginResult!.Token);
+                ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(loginModel.Email!, claims);
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult.Token);
+
+                return loginResult;
             }
+            catch (Exception ex)
+            {
+                // Handle the exception (log, rethrow, etc.)
+                throw new ApplicationException("Login failed.", ex);
+            }
+        }
 
-            await _localStorage.SetItemAsync("authToken", loginResult!.Token);
-            ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(loginModel.Email!);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult.Token);
 
-            return loginResult;
+        public async Task<bool> CheckUserRoles(string userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/Accounts/CheckUserRoles/{userId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var roles = JsonSerializer.Deserialize<List<string>>(responseContent);
+
+                    // Check if the user has any roles
+                    return roles != null && roles.Any();
+                }
+
+                return false;  // Or handle the error as needed
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (log, rethrow, etc.)
+                throw new ApplicationException("Failed to check user roles.", ex);
+            }
+        }
+
+        private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwt);
+            return token.Claims;
         }
 
         public async Task Logout()
