@@ -1,8 +1,14 @@
 ﻿@page "/AthReg"
 @using Newtonsoft.Json;
+@using System.Security.Claims;
 @using irunsaapp.Models
 @using irunsaapp.Services
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Net.Http.Json
+﻿@using Microsoft.AspNetCore.Components.Authorization;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@inject IAuthService AuthService
 @inject HttpClient httpClient
 
 
@@ -17,6 +23,8 @@
 
 <MudGrid Class="mt-n15 pt-0">
     <MudItem xs="12">
+
+
         <EditForm Model="athleteEntity" OnValidSubmit="HandleAthleteReg">
             <MudCard Elevation="1" Class="rounded-lg py-1">
                 <MudCardContent>
@@ -33,10 +41,35 @@
                         </div>
                     }
 
-                    <MudTextField  T="string" Label="Name" Id="Name" @bind-Value="athleteEntity.AthleteName" Variant="Variant.Outlined"
+                    <MudGrid>
+                     
+                        <MudItem xs="6">
+                            <MudAvatar Style="height:70px; width:70px; font-size:2rem;">
+                                <MudImage Src="images/mony.jpg"></MudImage>
+                            </MudAvatar>
+                    
+                     
+                        </MudItem>
+                        <MudItem xs="6" >
+                            <MudFileUpload align-end Context="file" T="IBrowserFile">
+                                <ButtonTemplate>
+                                    <MudIconButton HtmlTag="label"
+                                                   Color="Color.Info"
+                                                   Icon="@Icons.Material.Filled.PhotoCamera"
+                                                   for="@file">
+                                    </MudIconButton>
+                                </ButtonTemplate>
+                            </MudFileUpload>
+                        </MudItem>
+                     
+                    </MudGrid>
+                     
+       
+                 
+                    <MudTextField T="string" Label="Name" Id="Name" Disabled="true" @bind-Value="athleteEntity.AthleteName" Variant="Variant.Outlined"
                                   Adornment="Adornment.End" />
                     <ValidationMessage For="@(() => athleteEntity.AthleteName)" />
-                    <MudTextField T="string" Label="Surname" Id="Surname" @bind-Value="athleteEntity.AthleteSurname" Variant="Variant.Outlined"
+                    <MudTextField T="string" Label="Surname" Id="Surname" @bind-Value="athleteEntity.AthleteSurname" Disabled="true" Variant="Variant.Outlined"
                                   Adornment="Adornment.End" />
                     <ValidationMessage For="@(() => athleteEntity.AthleteSurname)" />
 
@@ -82,26 +115,57 @@
                     <ValidationMessage For="@(() => athleteEntity.DOB)" />
 
 
-               
-        
+                    <MudRadioGroup T="int" @bind-SelectedOption="athleteEntity.GenderId" Class="d-flex flex-column">
+                            <MudRadio Option="1"  Color="Color.Primary">Male</MudRadio>
+                        <MudRadio Option="2" Color="Color.Secondary">Female</MudRadio>
 
-                    <MudTextField Class="mt-3" T="int?" Label="Club Entity ID" Id="ClubEntityId" @bind-Value="athleteEntity.ClubEntityId" Variant="Variant.Filled" Margin="Margin.Dense"
-                                  AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle" />
-                    <ValidationMessage For="@(() => athleteEntity.ClubEntityId)" />
+                        </MudRadioGroup>
 
-                    <MudTextField Class="mt-3" T="string" Label="Email" Id="email" InputType="InputType.Email" @bind-Value="athleteEntity.Email" Variant="Variant.Filled" Margin="Margin.Dense"
-                                  AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AlternateEmail" />
-                    <ValidationMessage For="@(() => athleteEntity.Email)" />
+                               <MudTextField DebounceInterval="1" OnDebounceIntervalElapsed="HandleIntervalElapsed2" @bind-Value="selectedclubname" HelperText="@searchTerm2" Label="Associated Club" Variant="Variant.Outlined" Adornment="Adornment.End" />
+                    
+                    @if (searchResults2 != null)
+                    {
+                        <MudSimpleTable Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Style="overflow-x: auto;">
+
+                            <tbody>
+                                @if (searchResults2.Any())
+                                {
+                                    @foreach (var club in searchResults2)
+                                    {
+
+                                        <tr @onclick=@(_ => SelectClub(club.ClubListId,club.Club))>
+
+                                            <td style="text-align:left">@($"{club.Club}")</td>
+                                            
+
+                                        </tr>
+                                    }
+
+                                }
+                                else
+
+                                {
+                                  
+                                }
+                            </tbody>
+                        </MudSimpleTable>
+                      }
+
+                    <MudTextField T="string" Label="Email" Id="Email" @bind-Value="athleteEntity.Email" Disabled="true" Variant="Variant.Outlined"
+                                  Adornment="Adornment.End" />
+                    <ValidationMessage For="@(() => athleteEntity.ID_Passport)" />
+
+                
                     
                     <MudButton Class="my-4 py-2 rounded-lg" ButtonType="ButtonType.Submit" Color="Color.Tertiary" FullWidth="true" Variant="Variant.Filled">Create Account</MudButton>
-
+@* 
                     <div class="d-flex justify-center my-5">
                         <MudLink Href="/pages/sign-in" Typo="Typo.body2">Already Registered? Sign in</MudLink>
                     </div>
 
                     <MudButton Class="my-1 py-2 rounded-lg" Color="Color.Primary" DisableElevation FullWidth="true" StartIcon="fab fa-facebook" Variant="Variant.Filled">Register with Facebook</MudButton>
                     <MudButton Class="my-1 py-2 rounded-lg" Color="Color.Error" DisableElevation FullWidth="true" StartIcon="fab fa-google" Variant="Variant.Filled">Register with Google</MudButton>
-                    <MudButton Class="my-1 py-2 rounded-lg" Color="Color.Default" DisableElevation FullWidth="true" StartIcon="fab fa-apple" Variant="Variant.Filled">Register with Apple</MudButton>
+                    <MudButton Class="my-1 py-2 rounded-lg" Color="Color.Default" DisableElevation FullWidth="true" StartIcon="fab fa-apple" Variant="Variant.Filled">Register with Apple</MudButton> *@
                     </MudCardContent>
                     </MudCard>
                     </EditForm>
@@ -113,23 +177,71 @@
     private bool ShowErrors;
     private IEnumerable<string>? Errors;
     private string searchTerm;
+    private string searchTerm2;
     private List<Country> searchResults;
-    private bool dense = false;
+    private List<ClubList> searchResults2;
+    private bool dense = true;
     private bool hover = true;
-    private bool striped = false;
+    private bool striped = true;
     private bool bordered = false;
     int? selectedcountryid;
     string? selectedcountryname;
+    int? selectedclubid;
+    string? selectedclubname;
     public DateTime? DOB { get; set; }
     DateTime? date = DateTime.Today;
-    //private Task OnSearchInput(ChangeEventArgs e)
-    //{
-    //    searchTerm = e.Value.ToString();
+    private async Task PrepopulateFormFromClaims()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-    //    // Call your search function here and update searchResults
-    //    searchResults =  Search(searchTerm);
+        if (user.Identity.IsAuthenticated)
+        {
+            athleteEntity.Email = user.FindFirst(ClaimTypes.Email)?.Value;
+            athleteEntity.AthleteName = user.FindFirst(ClaimTypes.Name)?.Value;
+            athleteEntity.AthleteSurname = user.FindFirst(ClaimTypes.Surname)?.Value;
+        }
+    }
 
-    //}
+
+
+    // This gets called when the component is initialized
+    protected override async Task OnInitializedAsync()
+    {
+        await PrepopulateFormFromClaims();
+        await base.OnInitializedAsync();
+    }
+    void HandleIntervalElapsed2(string debouncedText)
+    {
+
+
+        // Call your search function here and update searchResults
+        searchResults2 = Search2(debouncedText);
+        // at this stage, interval has elapsed
+    }
+    private List<ClubList> Search2(string value)
+    {
+        var responseTask = httpClient.GetStringAsync($"api/ClubList/ClibList/{value}");
+        responseTask.Wait(); // Blocking call, which should be used with caution
+
+        if (responseTask.IsCompletedSuccessfully)
+        {
+            var response = responseTask.Result;
+            return JsonConvert.DeserializeObject<List<ClubList>>(response);
+        }
+        else
+        {
+            throw new Exception("Failed to get response.");
+        }
+    }
+
+    void SelectClub(int id, string country)
+    {
+        selectedclubid = id;
+        selectedclubname = country;
+        searchResults2 = null;
+    }
+    
     void HandleIntervalElapsed(string debouncedText)
     {
 
@@ -160,6 +272,7 @@
         selectedcountryname = country;
         searchResults = null;
     }
+ 
 
     private async Task HandleAthleteReg()
     {
@@ -177,4 +290,4 @@
         // ... Include other fields
     }
 }
-}
+

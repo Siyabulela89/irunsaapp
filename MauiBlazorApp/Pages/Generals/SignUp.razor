@@ -48,7 +48,18 @@
                               T="string" AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.Lock" />
                 <ValidationMessage For="@(() => RegisterModel.ConfirmPassword)" />
 
-                    <MudButton Class="my-4 py-2 rounded-lg" ButtonType="ButtonType.Submit" Color="Color.Tertiary" FullWidth="true" Variant="Variant.Filled"> Creat Account </MudButton>
+                    <MudButton Class="my-4 py-2 rounded-lg" Disabled="@_processing" OnClick="ProcessSomething" ButtonType="ButtonType.Submit" Color="Color.Tertiary" FullWidth="true" Variant="Variant.Filled">
+
+                        @if (_processing)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ms-2">Processing</MudText>
+                        }
+                        else
+                        {
+                            <MudText>Create Login</MudText>
+                        }
+                    </MudButton>
                   
                 <div class="d-flex justify-center my-5">
                     <MudLink Href="/pages/sign-in" Typo="Typo.body2">Already Registered? Sign in</MudLink>
@@ -70,11 +81,16 @@
     private bool ShowErrors;
     private IEnumerable<string>? Errors;
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private bool _processing = false;
+    async Task ProcessSomething()
+    {
+        _processing = true;
 
-
+       
+    }
     private async Task HandleRegistration()
     {
-        
+       
         ShowErrors = false;
 
         var result = await AuthService.Register(RegisterModel);
@@ -92,6 +108,7 @@
         {
             Errors = result.Errors;
             ShowErrors = true;
+            _processing = false;
         }
     }
 
