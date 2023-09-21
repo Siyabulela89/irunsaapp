@@ -1,4 +1,4 @@
-﻿@page "/AthReg"
+﻿@page "/AthReg/{ismine}"
 @using Newtonsoft.Json;
 @using System.Security.Claims;
 @using irunsaapp.Models
@@ -45,15 +45,16 @@
                      
                         <MudItem xs="6">
                             <MudAvatar Style="height:70px; width:70px; font-size:2rem;">
-                                <MudImage Src="images/mony.jpg"></MudImage>
+                                <MudImage Src="@imageDataUrl"></MudImage>
                             </MudAvatar>
                     
                      
                         </MudItem>
                         <MudItem xs="6" >
-                            <MudFileUpload align-end Context="file" T="IBrowserFile">
+                            <MudFileUpload Context="file" FilesChanged="OnFileSelected" T="IBrowserFile">
                                 <ButtonTemplate>
                                     <MudIconButton HtmlTag="label"
+                                                  
                                                    Color="Color.Info"
                                                    Icon="@Icons.Material.Filled.PhotoCamera"
                                                    for="@file">
@@ -63,13 +64,13 @@
                         </MudItem>
                      
                     </MudGrid>
-                     
+                    <MudAlert class="@invisi" Severity="Severity.Error">@errorMessage</MudAlert>
        
                  
-                    <MudTextField T="string" Label="Name" Id="Name" Disabled="true" @bind-Value="athleteEntity.AthleteName" Variant="Variant.Outlined"
+                    <MudTextField T="string" Label="Name" Id="Name" Disabled="@cantedit" @bind-Value="athleteEntity.AthleteName" Variant="Variant.Outlined"
                                   Adornment="Adornment.End" />
                     <ValidationMessage For="@(() => athleteEntity.AthleteName)" />
-                    <MudTextField T="string" Label="Surname" Id="Surname" @bind-Value="athleteEntity.AthleteSurname" Disabled="true" Variant="Variant.Outlined"
+                    <MudTextField T="string" Label="Surname" Id="Surname" @bind-Value="athleteEntity.AthleteSurname" Disabled="@cantedit" Variant="Variant.Outlined"
                                   Adornment="Adornment.End" />
                     <ValidationMessage For="@(() => athleteEntity.AthleteSurname)" />
 
@@ -151,7 +152,7 @@
                         </MudSimpleTable>
                       }
 
-                    <MudTextField T="string" Label="Email" Id="Email" @bind-Value="athleteEntity.Email" Disabled="true" Variant="Variant.Outlined"
+                    <MudTextField T="string" Label="Email" Id="Email" @bind-Value="athleteEntity.Email" Disabled="@cantedit" Variant="Variant.Outlined"
                                   Adornment="Adornment.End" />
                     <ValidationMessage For="@(() => athleteEntity.ID_Passport)" />
 
@@ -172,7 +173,7 @@
                     </MudItem>
                     </MudGrid>
 
-                    @code {
+@code {
     private AthleteEntity athleteEntity = new AthleteEntity();
     private bool ShowErrors;
     private IEnumerable<string>? Errors;
@@ -190,27 +191,87 @@
     string? selectedclubname;
     public DateTime? DOB { get; set; }
     DateTime? date = DateTime.Today;
-    private async Task PrepopulateFormFromClaims()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+    [Parameter]
+    public string ismine { get; set; }
+    bool cantedit;
+    string invisi ="invisible";
+    string errorMessage;
 
-        if (user.Identity.IsAuthenticated)
+  
+    private IBrowserFile selectedFile;
+    private string imageDataUrl;
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    private async void OnFileSelected(IBrowserFile file)
+    { 
+        invisi = "invisible";
+        if (file != null)
         {
-            athleteEntity.Email = user.FindFirst(ClaimTypes.Email)?.Value;
-            athleteEntity.AthleteName = user.FindFirst(ClaimTypes.Name)?.Value;
-            athleteEntity.AthleteSurname = user.FindFirst(ClaimTypes.Surname)?.Value;
+            // Define the maximum allowed size in bytes
+            long maxAllowedSizeBytes = 1024 * 50000;  // 5 MB
+
+            if (file.Size > maxAllowedSizeBytes)
+            {
+                errorMessage = "File size exceeds the maximum allowed size.";
+                invisi = "";
+                return;
+            }
+
+            // Check allowed file extensions (case-insensitive)
+            string[] allowedExtensions = { ".jpeg", ".jpg", ".bmp", ".png", ".gif", ".tiff" };
+            string fileExtension = Path.GetExtension(file.Name).ToLower();
+            if (!allowedExtensions.Any(ext => ext.Equals(fileExtension, StringComparison.OrdinalIgnoreCase)))
+            {
+              
+                errorMessage = "Only JPEG, BMP, PNG, GIF, and TIFF file types are allowed.";
+                invisi = "";
+                return;
+            }
+        
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream(maxAllowedSizeBytes).ReadAsync(buffer);
+            var imageBase64 = Convert.ToBase64String(buffer);
+            imageDataUrl = $"data:{file.ContentType};base64,{imageBase64}";
+            StateHasChanged(); // Update the UI
         }
     }
 
+  
+    private async Task PrepopulateFormFromClaims()
+    {
+        if (ismine == "yes")
+        {
+            cantedit = true;
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+
+            if (user.Identity.IsAuthenticated)
+            {
+                athleteEntity.Email = user.FindFirst(ClaimTypes.Email)?.Value;
+                athleteEntity.AthleteName = user.FindFirst(ClaimTypes.Name)?.Value;
+                athleteEntity.AthleteSurname = user.FindFirst(ClaimTypes.Surname)?.Value;
+            }
+        }
+        else
+
+        {
+            cantedit = false;
+            
+        }
+    }
+
+      
 
 
     // This gets called when the component is initialized
     protected override async Task OnInitializedAsync()
     {
+       
+
         await PrepopulateFormFromClaims();
         await base.OnInitializedAsync();
     }
+
     void HandleIntervalElapsed2(string debouncedText)
     {
 

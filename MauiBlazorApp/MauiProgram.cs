@@ -14,6 +14,7 @@ using Blazored.LocalStorage;
 using irunsaapp.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using irunsaapp.Helper;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace irunsaapp;
 
@@ -31,6 +32,10 @@ public static class MauiProgram
         builder.Services.AddScoped(sp => new HttpClient {BaseAddress= new Uri("https://irunsa.co.za/")});
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
+        builder.Services.Configure<KestrelServerOptions>(options =>
+        {
+            options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50 MB
+        });
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
 #endif

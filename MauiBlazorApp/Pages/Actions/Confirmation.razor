@@ -27,12 +27,12 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     private bool _processing = false;
-
+    private string ismine = "yes";
 
     void Submit()
     {
         _processing = true;
-        NavigationManager.NavigateTo("/AthReg");
+        NavigationManager.NavigateTo("/AthReg/"+ismine);
        
        
     }
