@@ -8,7 +8,17 @@
             <MudText Align="Align.Center" Typo="Typo.body2" Class=""> Please note that if you are under the age of 18 years, you would have to get your legal Gaurdian to register on your behalf</MudText>
         </MudPaper>
         <div class="mt-5 d-flex flex-grow-1 gap-4">
-            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="Submit"> Yes I am </MudButton>
+            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">
+                 @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Processing</MudText>
+                }
+                else
+                {
+                    <MudText>Yes I am</MudText>
+                }
+            </MudButton>
             <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="Cancel"> No I am not </MudButton>
         </div>
     </DialogContent>
@@ -16,10 +26,13 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private bool _processing = false;
+    private string ismine = "yes";
 
     void Submit()
     {
-        NavigationManager.NavigateTo("/AthReg");
+        _processing = true;
+        NavigationManager.NavigateTo("/AthReg/"+ismine);
        
        
     }

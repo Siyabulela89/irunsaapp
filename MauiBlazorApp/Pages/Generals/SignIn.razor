@@ -40,7 +40,19 @@
                               T="string" AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.Lock" />
 
                     <ValidationMessage For="@(() => loginModel.Password)" />
-                <MudButton Class="my-4 py-2 rounded-lg" Color="Color.Tertiary" ButtonType="ButtonType.Submit" FullWidth="true" Variant="Variant.Filled"> Login </MudButton>
+                    <MudButton Class="my-4 py-2 rounded-lg" Color="Color.Tertiary" Disabled="@_processing" OnClick="ProcessSomething" ButtonType="ButtonType.Submit" FullWidth="true" Variant="Variant.Filled">
+
+                        @if (_processing)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ms-2">Processing</MudText>
+                        }
+                        else
+                        {
+                            <MudText>Login</MudText>
+                        }
+                    </MudButton>
+              
 
                 <MudDivider Class="my-3"></MudDivider>
                 <MudText Align="Align.Center" Typo="Typo.body2"> Or </MudText>
@@ -61,10 +73,17 @@
 </MudGrid>
 @code {
     private LoginModel loginModel = new LoginModel();
-
+    
     private bool ShowErrors;
     private string Error = "";
+    private bool _processing = false;
 
+    async Task ProcessSomething()
+    {
+        _processing = true;
+      
+   
+    }
     private async Task HandleLogin()
     {
         ShowErrors = false;
@@ -88,6 +107,7 @@
             {
                 Error = result.Error!;
                 ShowErrors = true;
+                _processing = false;
             }
         }
         catch (Exception ex)
