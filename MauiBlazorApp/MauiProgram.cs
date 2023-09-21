@@ -63,14 +63,13 @@ public static class MauiProgram
 #endif
         });
         builder.Services.AddBlazoredLocalStorage();
-        builder.Services.AddSingleton<IDashboardType, DashboardService>();
+        builder.Services.AddSingleton<IEntityType, EntityTypeService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddSingleton<WeatherForecastService>();
         builder.Services.AddSingleton<DataAccess>();
         builder.Services.AddSingleton<WeatherForecastService>();
-        builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
         builder.Services.AddAuthorizationCore();
-   
+        builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 
 
 
