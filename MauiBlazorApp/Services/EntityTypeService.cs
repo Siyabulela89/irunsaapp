@@ -16,7 +16,7 @@ namespace irunsaapp.Services
             _httpClient = httpClient;
         }
 
-        public async Task<AthleteEntity> AddathleteEntity(AthleteEntity athleteEntity)
+        public async Task<AthleteEntity> AddAthleteEntity(AthleteEntity athleteEntity)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace irunsaapp.Services
             }
         }
 
-        public async Task<List<Country>> GetallCountries()
+        public async Task<List<Country>> GetAllCountries()
         {
             try
             {

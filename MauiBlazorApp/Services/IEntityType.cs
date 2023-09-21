@@ -11,7 +11,7 @@ namespace irunsaapp.Services
     public interface IEntityType
     {
         Task<List<EntityType>> GetAllEntityTypelist();
-        Task<List<Country>> GetallCountries();
-        Task<AthleteEntity> AddathleteEntity(AthleteEntity AthleteEntity);
+        Task<List<Country>> GetAllCountries();
+        Task<AthleteEntity> AddAthleteEntity(AthleteEntity AthleteEntity);
     }
 }
