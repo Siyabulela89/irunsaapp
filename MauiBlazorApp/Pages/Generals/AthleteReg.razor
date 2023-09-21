@@ -134,9 +134,9 @@
                                     @foreach (var club in searchResults2)
                                     {
 
-                                        <tr @onclick=@(_ => SelectClub(club.ClubListId,club.Club))>
+                                        <tr @onclick=@(_ => SelectClub(club.ClubId,club.ClubDescription))>
 
-                                            <td style="text-align:left">@($"{club.Club}")</td>
+                                            <td style="text-align:left">@($"{club.ClubDescription}")</td>
                                             
 
                                         </tr>
@@ -180,7 +180,7 @@
     private string searchTerm;
     private string searchTerm2;
     private List<Country> searchResults;
-    private List<ClubList> searchResults2;
+    private List<Club> searchResults2;
     private bool dense = true;
     private bool hover = true;
     private bool striped = true;
@@ -280,7 +280,7 @@
         searchResults2 = Search2(debouncedText);
         // at this stage, interval has elapsed
     }
-    private List<ClubList> Search2(string value)
+    private List<Club> Search2(string value)
     {
         var responseTask = httpClient.GetStringAsync($"api/Club/AutoComplete/{value}");
         responseTask.Wait(); // Blocking call, which should be used with caution
@@ -288,7 +288,7 @@
         if (responseTask.IsCompletedSuccessfully)
         {
             var response = responseTask.Result;
-            return JsonConvert.DeserializeObject<List<ClubList>>(response);
+            return JsonConvert.DeserializeObject<List<Club>>(response);
         }
         else
         {
