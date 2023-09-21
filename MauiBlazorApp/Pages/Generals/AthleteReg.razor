@@ -282,7 +282,7 @@
     }
     private List<ClubList> Search2(string value)
     {
-        var responseTask = httpClient.GetStringAsync($"api/ClubList/ClibList/{value}");
+        var responseTask = httpClient.GetStringAsync($"api/Club/AutoComplete/{value}");
         responseTask.Wait(); // Blocking call, which should be used with caution
 
         if (responseTask.IsCompletedSuccessfully)
@@ -313,7 +313,7 @@
     }
     private List<Country> Search(string value)
     {
-        var responseTask = httpClient.GetStringAsync($"api/Country/Autocomplete/{value}");
+        var responseTask = httpClient.GetStringAsync($"api/Country/AutoComplete/{value}");
         responseTask.Wait(); // Blocking call, which should be used with caution
 
         if (responseTask.IsCompletedSuccessfully)
