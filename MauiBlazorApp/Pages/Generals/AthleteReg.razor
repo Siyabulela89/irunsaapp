@@ -44,11 +44,19 @@
                     <MudGrid>
                      
                         <MudItem xs="6">
-                            <MudAvatar Style="height:70px; width:70px; font-size:2rem;">
-                                <MudImage Src="@imageDataUrl"></MudImage>
-                            </MudAvatar>
-                    
-                     
+                            @if (_processing)
+                            {
+                                <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+                            }
+                            else
+                            {
+                                <MudAvatar Style="height:70px; width:70px; font-size:2rem;">
+                                    <MudImage Src="@imageDataUrl"></MudImage>
+                                </MudAvatar>
+                            }
+                         
+
+                       
                         </MudItem>
                         <MudItem xs="6" >
                             <MudFileUpload Context="file" FilesChanged="OnFileSelected" T="IBrowserFile">
@@ -114,7 +122,7 @@
                     <MudDatePicker Label="Date of Birth" Editable="true" @bind-Date="athleteEntity.DOB"  Placeholder="Select Date" />
               
                     <ValidationMessage For="@(() => athleteEntity.DOB)" />
-
+                    
 
                     <MudRadioGroup T="int" @bind-SelectedOption="athleteEntity.GenderId" Class="d-flex flex-column">
                             <MudRadio Option="1"  Color="Color.Primary">Male</MudRadio>
@@ -201,8 +209,12 @@
     private IBrowserFile selectedFile;
     private string imageDataUrl;
     IList<IBrowserFile> files = new List<IBrowserFile>();
+    private bool _processing = false;
+
+  
     private async void OnFileSelected(IBrowserFile file)
-    { 
+    {
+        _processing = true;
         invisi = "invisible";
         if (file != null)
         {
@@ -213,6 +225,7 @@
             {
                 errorMessage = "File size exceeds the maximum allowed size.";
                 invisi = "";
+                _processing = false;
                 return;
             }
 
@@ -224,6 +237,7 @@
               
                 errorMessage = "Only JPEG, BMP, PNG, GIF, and TIFF file types are allowed.";
                 invisi = "";
+                _processing = false;
                 return;
             }
         
@@ -231,7 +245,9 @@
             await file.OpenReadStream(maxAllowedSizeBytes).ReadAsync(buffer);
             var imageBase64 = Convert.ToBase64String(buffer);
             imageDataUrl = $"data:{file.ContentType};base64,{imageBase64}";
+            _processing = false;
             StateHasChanged(); // Update the UI
+     
         }
     }
 
