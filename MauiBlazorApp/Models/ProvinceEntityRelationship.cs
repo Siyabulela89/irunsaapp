@@ -3,18 +3,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace irunsaapp.Models
 {
-    public class LicenseStatus
+    public class ProvinceEntityRelationship
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int LicenseStatusId { get; set; }
-        public int LicenseStatusDescription { get; set; }
+        public int ProvinceEntityRelationshipId { get; set; }
+        public int ProvinceId { get; set; }
+        public int EntityTypeID { get; set; }
+        public int EntiyId { get; set; }
         public int CreatedByUserId { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
 
-        //Active
-        //Assigned
-        //Expired
     }
 }

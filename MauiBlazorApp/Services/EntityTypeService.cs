@@ -51,7 +51,7 @@ namespace irunsaapp.Services
             {
                 // Handle the exception (log, rethrow, etc.)
                 throw new ApplicationException("Failed to get countries list.", ex);
-}}
+        }}
         
         public async Task<List<EntityType>> GetAllEntityTypelist()
         {
@@ -64,6 +64,60 @@ namespace irunsaapp.Services
             {
                 // Handle the exception (log, rethrow, etc.)
                 throw new ApplicationException("Failed to get EntityType list.", ex);
+            }
+        }
+
+
+        public async Task<List<Club>> SearchClubs(string debouncedText)
+        {
+            try
+            {
+                var response = await _httpClient.GetStringAsync($"api/Club/AutoComplete/{debouncedText}");
+                return JsonSerializer.Deserialize<List<Club>>(response);
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (log, rethrow, etc.)
+                throw new ApplicationException("Failed to get club list.", ex);
+            }
+        }
+
+        public async Task<List<Province>> GetAllProvinces()
+        {
+            try
+            {
+                var response = await _httpClient.GetStringAsync("api/Province/GetAll");
+                return JsonSerializer.Deserialize<List<Province>>(response);
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (log, rethrow, etc.)
+                throw new ApplicationException("Failed to get provinces list.", ex);
+            }
+        }
+
+        public async Task<string> AddClubEntity(ClubEntity clubEntity)
+        {
+            try
+            {
+                var clubAsJson = JsonSerializer.Serialize(clubEntity);
+                var content = new StringContent(clubAsJson, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("api/ClubEntity/AddClubEntity", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return null; // Or handle the error as needed
+                }
+                return "";
+
+                //var responseContent = await response.Content.ReadAsStringAsync();
+                //return JsonSerializer.Deserialize<ClubEntity>(responseContent);
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (log, rethrow, etc.)
+                throw new ApplicationException("Failed to add club entity.", ex);
             }
         }
     }

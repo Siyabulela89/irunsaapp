@@ -3,13 +3,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace irunsaapp.Models
 {
-    public class EntityRole
+    public class Province
     {
+     
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int EntityRoleId { get; set; }
-        public int RoleTypeId { get; set; }
-        public int EntiyId { get; set; }
-        public bool HasAccess { get; set; }
+        public int ProvinceId { get; set; }
+        public string ProvinceName { get; set; }
+
+        //Gauteng
+        //NorthWest
+        //ETC
+
     }
 }

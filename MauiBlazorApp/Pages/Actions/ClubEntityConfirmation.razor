@@ -1,4 +1,5 @@
-﻿<MudDialog Class="ma-3 py-5 rounded-lg">
+﻿@inject NavigationManager NavigationManager
+<MudDialog Class="ma-3 py-5 rounded-lg">
     <TitleContent>
     </TitleContent>
     <DialogContent>
@@ -6,13 +7,11 @@
             <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Default" Style="font-weight: 600">I can only proceed if:</MudText>
             <MudText Align="Align.Center" Typo="Typo.body2" Class="">1. I am acting as a Legal Gaurdian for an Athlete(s) who is under the age of 18 years, Or </MudText>
             <MudItem xs="12" sm="12" md="12">
-                <MudDivider></MudDivider>
-        
+                <MudDivider></MudDivider>        
             </MudItem>
             <MudText Align="Align.Center" Typo="Typo.body2" Class="">2. I am the Athlete(s) Representative/Manager, And</MudText>
             <MudItem xs="12" sm="12" md="12">
-                <MudDivider></MudDivider>
-      
+                <MudDivider></MudDivider>      
             </MudItem>
             <MudText Align="Align.Center" Typo="Typo.body2" Class="">3. I myself am over the age of 18 years</MudText>
         </MudPaper>
@@ -23,12 +22,16 @@
     </DialogContent>
 </MudDialog>
 
-@code {
+@code
+{
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
+    private bool _processing = false;
+    
     void Submit()
     {
-        MudDialog.Close(DialogResult.Ok(true));
+        _processing = true;
+        NavigationManager.NavigateTo("/pages/Club/ClubEntity");
     }
     void Cancel() => MudDialog.Cancel();
 }
