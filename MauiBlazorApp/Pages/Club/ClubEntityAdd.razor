@@ -1,0 +1,308 @@
+﻿@page "/pages/Club/ClubEntity"
+
+@using irunsaapp.Models;
+@using irunsaapp.Pages.Actions;
+@using irunsaapp.Pages.Components
+@using irunsaapp.Services;
+@using System.Net.Http.Json
+@using Newtonsoft.Json;
+
+@inject HttpClient httpClient
+@inject IEntityType EntityTypeService
+@inject NavigationManager NavigationManager
+
+<MudPaper Elevation="3" Height="150" Class="px-4 mx-n4 mt-n10 pt-10 mud-theme-primary" Style="border-radius: 0px 0px 45px 45px;" Outlined="false">
+    <MudPaper Elevation="0" Class="py-6" Style="background-color: transparent">
+
+    </MudPaper>
+</MudPaper>
+
+<MudGrid Class="mt-n15 pt-0">
+    <MudItem xs="12">
+        <EditForm Model="clubEntity" OnValidSubmit="SubmitClaim">
+        <MudCard Elevation="1" Class="rounded-lg py-1">
+            <MudCardContent>
+                @*
+                <MudText Color="Color.Default" Typo="Typo.h6" Style="font-weight: 600;">Sign Up</MudText>
+                <MudText Class="mb-5" Typo="Typo.body2">Get started in minutes</MudText> 
+                *@
+
+                @if (ShowErrors)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @foreach (var error in Errors!)
+                        {
+                            <p>@error</p>
+                        }
+                    </div>
+                }
+                
+                @if (ShowSearchField)
+                {
+                <MudTextField DebounceInterval="1" OnDebounceIntervalElapsed="SearchClub" @bind-Value="selectedClubName" HelperText="@searchTerm" Label="Search Club Name" Variant="Variant.Outlined" Adornment="Adornment.End" />
+                }
+
+                @if (clubList.Any())
+                {
+                    <MudSimpleTable Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Style="overflow-x: auto;">
+
+                    <tbody>
+                        @foreach (var club in clubList)
+                        {
+                            <tr @onclick=@(_ => SelectClub(club.ClubId,club.ClubDescription))>
+
+                                <td style="text-align:left">@($"{club.ClubDescription}")</td>
+                                @*
+                                    <td style="text-align:right"> <img width="30" src="@($"Countries/{club.Shortcodeflag}")" alt="Country Flag" /></td>
+                                *@
+                            </tr>
+                        }
+
+                        @if (ShowClaimConfirmation)
+                        {
+                            <MudAlert Severity="Severity.Error">Would you like to claim the club?</MudAlert>
+                            <div class="mt-5 d-flex flex-grow-1 gap-4">
+                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="ClaimYes">Claim</MudButton>
+                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="ClaimNo">Cancel</MudButton>
+                            </div>                                        
+                        }
+                    </tbody>
+
+                    </MudSimpleTable>
+                }
+                else if (!clubList.Any()) @* !string.IsNullOrEmpty(selectedClubName) *@
+                {
+                    @if (ShowAddClubConfirmation)
+                    {
+                    <MudAlert Severity="Severity.Error">Club name not found in pre-polulated list. Would you like to add a new club?</MudAlert>
+                    <div class="mt-5 d-flex flex-grow-1 gap-4">
+                        <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="AddClubYes">Yes</MudButton>
+                        <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="AddClubNo">No</MudButton>
+                    </div>
+                    }
+                }
+
+                @if (ShowClubEntityForm)
+                {
+                    <div>
+
+                        <MudTextField Class="mt-3" T="string" Label="Club Name" Id="ClubName" @bind-Value="selectedClubName" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle" />
+                        <ValidationMessage For="@(() => clubEntity.ClubName)" />
+
+                        <MudTextField Class="mt-3" T="string" Label="Club Registration Number" Id="ClubRegistrationNumber" @bind-Value="clubEntity.ClubRegistrationNumber" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle" />
+                        <ValidationMessage For="@(() => clubEntity.ClubRegistrationNumber)" />
+
+                        <CheckBoxList Data="@provinceList" TextField="@((item)=>item.ProvinceName)"
+                                        ValueField="@((item)=>item.ProvinceId)" SelectedValues="@associatedProvinceList" />
+
+                        <div class="mt-5 d-flex flex-grow-1 gap-4">
+                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="Test">Test</MudButton>
+                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitClaim">Submit Claim</MudButton>
+                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="CancelClaim">Cancel Claim</MudButton>
+                        </div>
+
+                    </div>
+                }
+          
+            </MudCardContent>
+        </MudCard>
+        </EditForm>
+    </MudItem>
+</MudGrid>
+
+
+@code {
+
+    private List<Province> provinceList = new List<Province>();
+
+    protected List<string> associatedProvinceList = new List<string>();
+
+    private List<ProvinceEntityRelationship> provinceEntityRelationshipList = new List<ProvinceEntityRelationship>();
+
+    private async void GetProvinces()
+    {
+        //Get provinces here
+        //provinceList = await EntityTypeService.GetAllProvinces();
+        provinceList = new List<Province>
+        {
+            new Province{ProvinceId = 1, ProvinceName = "EC"},
+            new Province{ProvinceId = 2, ProvinceName = "Gauteng"},
+            new Province{ProvinceId = 3, ProvinceName = "WC"},
+            new Province{ProvinceId = 4, ProvinceName = "FS"}
+        };
+    }
+    
+    private async void GetAssociatedProvinces()
+    {
+        //Get associated provinces here(ProvinceEntityRelationship)
+        //associatedProvinceList = await EntityTypeService.GetProvinceEntityRelationship(value);
+        associatedProvinceList = new List<string>
+        {
+            "1","2","3"
+        };
+    }
+
+    private async Task Test()
+    {
+        //Use values here
+        var OutPut = string.Join(",", associatedProvinceList.ToArray());
+        StateHasChanged();        
+    }
+
+
+
+
+
+    private List<Club> clubList = new List<Club>();
+
+    private ClubEntity clubEntity = new ClubEntity();
+
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool ShowClaimConfirmation = false;
+    private bool ShowAddClubConfirmation = false;
+    private bool ShowSearchField = true;
+    private bool ShowClubEntityForm = false;
+
+    public string searchTerm;
+    int selectedClubEntityId;
+    string selectedClubName;
+
+    private void SearchClub(string debouncedText)
+    {
+        if(!string.IsNullOrEmpty(debouncedText))
+        {
+            //clubList = await EntityTypeService.SearchClubs(debouncedText);
+
+            var responseTask = httpClient.GetStringAsync($"api/Club/AutoComplete/{debouncedText}");
+            responseTask.Wait(); // Blocking call, which should be used with caution
+
+            if (responseTask.IsCompletedSuccessfully)
+            {
+                var response = responseTask.Result;
+
+                clubList = JsonConvert.DeserializeObject<List<Club>>(response);
+
+                if (clubList.Any())
+                {
+                    ShowClaimConfirmation = false;
+                    ShowAddClubConfirmation = false;
+                    ShowClubEntityForm = false;                    
+                }
+                else
+                {
+                    ShowClaimConfirmation = false;
+                    ShowAddClubConfirmation = true;
+                    ShowClubEntityForm = false;
+                }
+            }
+            else
+            {
+                throw new Exception("Failed to get response.");
+            }
+        }
+        else
+        {
+            clubList.Clear();
+        }
+    }
+    void SelectClub(int clubId, string clubName)
+    {
+        selectedClubEntityId = clubId;
+        selectedClubName = clubName;
+
+        //Show claim buttons
+        ShowClaimConfirmation = true;
+        ShowAddClubConfirmation = false;
+        ShowClubEntityForm = false;
+
+
+        //Lock search box
+
+
+        //clubList.Clear();
+        // clubList = null;
+    }
+    private async Task ClaimYes()
+    {
+        ShowClaimConfirmation = false;
+        ShowAddClubConfirmation = false;
+        ShowClubEntityForm = true;
+        ShowSearchField = false;
+
+        GetProvinces();
+    }
+    private async Task ClaimNo()    
+    {
+        ShowClaimConfirmation = false;
+        ShowAddClubConfirmation = false;
+        ShowClubEntityForm = false;
+    }
+    private async Task AddClubYes()
+    {
+        ShowClaimConfirmation = false;
+        ShowAddClubConfirmation = false;
+        ShowClubEntityForm = true;
+        ShowSearchField = false;
+
+        GetProvinces();
+    }
+    private async Task AddClubNo()
+    {
+        ShowClaimConfirmation = false;
+        ShowAddClubConfirmation = false;
+        ShowClubEntityForm = false;
+    }
+    private async Task SubmitClaim()
+    {       
+        ShowErrors = false;
+
+        var result = await EntityTypeService.AddClubEntity(clubEntity);
+
+        if (result == "")
+        {
+            var options = new DialogOptions() { CloseButton = false, NoHeader = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.BottomCenter };
+            var parameters = new DialogParameters();
+            var dialog = _dialogService.Show<SuccessBox>("", parameters, options);
+
+            //Move the navigation here
+            //NavigationManager.NavigateTo("RegCat");
+        }
+        else
+        {
+            //Errors = "";
+            ShowErrors = true;
+            _processing = false;
+        }
+    }
+    private async Task CancelClaim()
+    {
+        ShowClaimConfirmation = false;
+        ShowAddClubConfirmation = false;
+        ShowClubEntityForm = false;
+        ShowSearchField = true;
+    }
+
+
+
+
+
+
+
+    private bool ShowErrors;
+    private IEnumerable<string>? Errors;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private bool _processing = false;
+    async Task ProcessSomething()
+    {
+        _processing = true;       
+    }
+
+
+
+
+}

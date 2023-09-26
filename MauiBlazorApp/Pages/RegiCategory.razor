@@ -52,7 +52,7 @@ else
                     <MudIconButton Icon="fa-solid fa-people-group" Color="Color.Warning" Class="pa-3 align-self-center" Size="Size.Large"></MudIconButton>
                     <MudText Typo="Typo.subtitle1" Style="font-weight: 500;" Class="align-self-center" Color="@Color.Surface">Register a Club</MudText>
                     <MudButtonGroup Class="mt-auto align-self-center mud-text-secondary" Color="Color.Warning" Variant="Variant.Text">
-                        <MudButton StartIcon="@Icons.Material.Filled.AppRegistration" @onclick="@(() => OnActionConfirmation3())" IconColor="Color.Warning">Register</MudButton>
+                        <MudButton StartIcon="@Icons.Material.Filled.AppRegistration" @onclick="@(() => OnActionClubEntityConfirmation())" IconColor="Color.Warning">Register</MudButton>
                     </MudButtonGroup>
                 </MudCardContent>
             </MudCard>
@@ -93,11 +93,11 @@ else
         var options = new DialogOptions() { CloseButton = false, NoHeader = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.Center };
         var dialog = _dialogService.Show<Confirmation2>("", parameters, options);
     }
-    public void OnActionConfirmation3()
+    public void OnActionClubEntityConfirmation()
     {
         var parameters = new DialogParameters();
         var options = new DialogOptions() { CloseButton = false, NoHeader = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.Center };
-        var dialog = _dialogService.Show<Confirmation3>("", parameters, options);
+        var dialog = _dialogService.Show<ClubEntityConfirmation>("", parameters, options);
     }
     public void OnActionConfirmation4()
     {

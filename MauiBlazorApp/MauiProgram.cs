@@ -29,7 +29,8 @@ public static class MauiProgram
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 			});
-        builder.Services.AddScoped(sp => new HttpClient {BaseAddress= new Uri("https://irunsa.co.za/")});
+        //builder.Services.AddScoped(sp => new HttpClient {BaseAddress= new Uri("https://irunsa.co.za/")});
+        builder.Services.AddScoped(sp => new HttpClient {BaseAddress= new Uri("https://localhost:7192/")});
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
         builder.Services.Configure<KestrelServerOptions>(options =>

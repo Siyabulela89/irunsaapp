@@ -10,14 +10,11 @@ namespace irunsaapp.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CoachEntityId { get; set; }
         public string CoachName { get; set; }
-        public string Avatar { get; set; }
 
         public string CreatedByUserId { get; set; }
         public DateTime CreateDate { get; set; }
         public string UpdatedByUserId { get; set; }
         public DateTime UpdateDate { get; set; }
-
-
 
     }
 }
