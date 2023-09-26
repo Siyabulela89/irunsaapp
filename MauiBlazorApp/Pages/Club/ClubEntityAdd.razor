@@ -58,27 +58,28 @@
                             </tr>
                         }
 
-                        @if (ShowClaimConfirmation)
-                        {
-                            <MudAlert Severity="Severity.Error">Would you like to claim the club?</MudAlert>
-                            <div class="mt-5 d-flex flex-grow-1 gap-4">
-                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="ClaimYes">Claim</MudButton>
-                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="ClaimNo">Cancel</MudButton>
-                            </div>                                        
-                        }
                     </tbody>
 
                     </MudSimpleTable>
                 }
                 else if (!clubList.Any()) @* !string.IsNullOrEmpty(selectedClubName) *@
                 {
+                    @if (ShowClaimConfirmation)
+                    {
+                        <MudAlert Severity="Severity.Error">Would you like to claim the club?</MudAlert>
+                        <div class="mt-5 d-flex flex-grow-1 gap-4">
+                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="ClaimYes">Claim</MudButton>
+                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="ClaimNo">Cancel</MudButton>
+                        </div>                                        
+                    }
+
                     @if (ShowAddClubConfirmation)
                     {
-                    <MudAlert Severity="Severity.Error">Club name not found in pre-polulated list. Would you like to add a new club?</MudAlert>
-                    <div class="mt-5 d-flex flex-grow-1 gap-4">
-                        <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="AddClubYes">Yes</MudButton>
-                        <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="AddClubNo">No</MudButton>
-                    </div>
+                        <MudAlert Severity="Severity.Error">Club name not found in pre-polulated list. Would you like to add a new club?</MudAlert>
+                        <div class="mt-5 d-flex flex-grow-1 gap-4">
+                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="AddClubYes">Yes</MudButton>
+                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="AddClubNo">No</MudButton>
+                        </div>
                     }
                 }
 
@@ -115,41 +116,60 @@
 
 @code {
 
-    private List<Province> provinceList = new List<Province>();
+    private List<Province> provinceList;
 
     protected List<string> associatedProvinceList = new List<string>();
 
     private List<ProvinceEntityRelationship> provinceEntityRelationshipList = new List<ProvinceEntityRelationship>();
 
-    private async void GetProvinces()
+    private void GetAllProvinces()
     {
         //Get provinces here
-        //provinceList = await EntityTypeService.GetAllProvinces();
-        provinceList = new List<Province>
+        //return await EntityTypeService.GetAllProvinces();
+
+        var responseTask = httpClient.GetStringAsync($"api/Province/GetAll");
+        responseTask.Wait(); // Blocking call, which should be used with caution
+
+        if (responseTask.IsCompletedSuccessfully)
         {
-            new Province{ProvinceId = 1, ProvinceName = "EC"},
-            new Province{ProvinceId = 2, ProvinceName = "Gauteng"},
-            new Province{ProvinceId = 3, ProvinceName = "WC"},
-            new Province{ProvinceId = 4, ProvinceName = "FS"}
-        };
+            var response = responseTask.Result;
+            provinceList = JsonConvert.DeserializeObject<List<Province>>(response);
+        }
+        else
+        {
+            throw new Exception("Failed to get response.");
+        }
     }
-    
-    private async void GetAssociatedProvinces()
+
+    private void GetAssociatedProvinces()
     {
         //Get associated provinces here(ProvinceEntityRelationship)
         //associatedProvinceList = await EntityTypeService.GetProvinceEntityRelationship(value);
-        associatedProvinceList = new List<string>
+
+        // associatedProvinceList = new List<string>
+        // {
+        //     "1","2","3"
+        // };
+
+        var entityTypeId = 2;//ClubEntity
+        var entityId = selectedClubEntityId;//Current record id/clubId
+        
+        var responseTask = httpClient.GetStringAsync($"api/ProvinceEntityRelationship/{entityTypeId}/{entityId}");
+        responseTask.Wait(); // Blocking call, which should be used with caution
+
+        if (responseTask.IsCompletedSuccessfully)
         {
-            "1","2","3"
-        };
+            var response = responseTask.Result;
+            List<ProvinceEntityRelationship> provinceEntityRelationshipList = JsonConvert.DeserializeObject<List<ProvinceEntityRelationship>>(response);
+            associatedProvinceList = provinceEntityRelationshipList.Select(x => x.ProvinceId.ToString()).ToList();            
+        }
+        else
+        {
+            throw new Exception("Failed to get response.");
+        }
     }
 
-    private async Task Test()
-    {
-        //Use values here
-        var OutPut = string.Join(",", associatedProvinceList.ToArray());
-        StateHasChanged();        
-    }
+   
 
 
 
@@ -178,14 +198,23 @@
         {
             //clubList = await EntityTypeService.SearchClubs(debouncedText);
 
-            var responseTask = httpClient.GetStringAsync($"api/Club/AutoComplete/{debouncedText}");
-            responseTask.Wait(); // Blocking call, which should be used with caution
 
-            if (responseTask.IsCompletedSuccessfully)
+            clubList = new List<Club>
             {
-                var response = responseTask.Result;
+                new Club{ClubId = 1, ClubDescription = "EC"},
+                new Club{ClubId = 2, ClubDescription = "Gauteng"},
+                new Club{ClubId = 3, ClubDescription = "WC"},
+                new Club{ClubId = 4, ClubDescription = "FS"}
+            };
 
-                clubList = JsonConvert.DeserializeObject<List<Club>>(response);
+            //var responseTask = httpClient.GetStringAsync($"api/Club/AutoComplete/{debouncedText}");
+            //responseTask.Wait(); // Blocking call, which should be used with caution
+
+            //if (responseTask.IsCompletedSuccessfully)
+            //{
+                //var response = responseTask.Result;
+
+                //clubList = JsonConvert.DeserializeObject<List<Club>>(response);
 
                 if (clubList.Any())
                 {
@@ -199,11 +228,11 @@
                     ShowAddClubConfirmation = true;
                     ShowClubEntityForm = false;
                 }
-            }
-            else
-            {
-                throw new Exception("Failed to get response.");
-            }
+            // }
+            // else
+            // {
+            //     throw new Exception("Failed to get response.");
+            // }
         }
         else
         {
@@ -219,12 +248,9 @@
         ShowClaimConfirmation = true;
         ShowAddClubConfirmation = false;
         ShowClubEntityForm = false;
+        ShowSearchField = true;
 
-
-        //Lock search box
-
-
-        //clubList.Clear();
+        clubList.Clear();
         // clubList = null;
     }
     private async Task ClaimYes()
@@ -234,13 +260,15 @@
         ShowClubEntityForm = true;
         ShowSearchField = false;
 
-        GetProvinces();
+        GetAllProvinces();
+        GetAssociatedProvinces();
     }
     private async Task ClaimNo()    
     {
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
         ShowClubEntityForm = false;
+        ShowSearchField = true;
     }
     private async Task AddClubYes()
     {
@@ -249,13 +277,15 @@
         ShowClubEntityForm = true;
         ShowSearchField = false;
 
-        GetProvinces();
+        GetAllProvinces();
+        GetAssociatedProvinces();
     }
     private async Task AddClubNo()
     {
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
         ShowClubEntityForm = false;
+        ShowSearchField = true;
     }
     private async Task SubmitClaim()
     {       
@@ -279,6 +309,16 @@
             _processing = false;
         }
     }
+    private async Task SubmitAssociatedProvinces()
+    {
+        //Use values here
+        var OutPut = string.Join(",", associatedProvinceList.ToArray());
+        StateHasChanged();
+
+
+
+
+    }
     private async Task CancelClaim()
     {
         ShowClaimConfirmation = false;
@@ -286,7 +326,6 @@
         ShowClubEntityForm = false;
         ShowSearchField = true;
     }
-
 
 
 
