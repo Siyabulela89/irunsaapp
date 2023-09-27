@@ -95,8 +95,18 @@
                                         AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle" />
                         <ValidationMessage For="@(() => clubEntity.ClubRegistrationNumber)" />
 
-                        <CheckBoxList Data="@provinceList" TextField="@((item)=>item.ProvinceName)"
-                                        ValueField="@((item)=>item.ProvinceId)" SelectedValues="@associatedProvinceList" />
+                        
+                        <MudItem>
+                            <MudField Label="Associated Provinces" Variant="Variant.Filled" InnerPadding="false" Margin="Margin.Dense"
+                                        AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle">
+                                <MudRadioGroup Class="mt-3" T="string">
+
+                                    <CheckBoxList Data="@provinceList" TextField="@((item)=>item.ProvinceName)"
+                                                    ValueField="@((item)=>item.ProvinceId)" SelectedValues="@associatedProvinceList" />
+
+                                </MudRadioGroup>
+                            </MudField> 
+                        </MudItem>  
 
                         <div class="mt-5 d-flex flex-grow-1 gap-4">
                             <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitClaim">Submit Claim</MudButton>
