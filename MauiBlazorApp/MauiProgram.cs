@@ -7,7 +7,9 @@ using Windows.Graphics;
 using Microsoft.AspNetCore.Components.WebView.Maui;
 using irunsaapp.Data;
 using MudBlazor.Services;
-
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.IO;
 using Microsoft.Maui.LifecycleEvents;
 using irunsaapp;
 using Blazored.LocalStorage;
@@ -29,8 +31,9 @@ public static class MauiProgram
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 			});
-        //builder.Services.AddScoped(sp => new HttpClient {BaseAddress= new Uri("https://irunsa.co.za/")});
-        builder.Services.AddScoped(sp => new HttpClient {BaseAddress= new Uri("https://localhost:7192/")});
+        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://irunsa.co.za/") });
+        //builder.Services.AddScoped(sp => new HttpClient {BaseAddress= new Uri("https://localhost:7192/")});
+      
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
         builder.Services.Configure<KestrelServerOptions>(options =>

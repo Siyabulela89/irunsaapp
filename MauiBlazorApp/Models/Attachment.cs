@@ -13,8 +13,8 @@ namespace irunsaapp.Models
         public int EntityId { get; set; }
         public int AttachmentGroupId { get; set; }
         public int AttachmentTypeId { get; set; }
-        public int AttachmentUrl { get; set; }
-        public int CreatedByUserId { get; set; }
+        public string AttachmentUrl { get; set; }
+        public string CreatedByUserId { get; set; }
         public DateTime CreateDate { get; set; }
 
 
