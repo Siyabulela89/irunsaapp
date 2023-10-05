@@ -1,4 +1,6 @@
 ﻿@page "/AthReg/{ismine}"
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Http.Internal;
 @using Newtonsoft.Json;
 @using System.Security.Claims;
 @using irunsaapp.Models
@@ -6,6 +8,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Net.Http.Json
 ﻿@using Microsoft.AspNetCore.Components.Authorization;
+@using System.Net.Http.Headers;
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @inject IAuthService AuthService
@@ -44,12 +47,32 @@
                     <MudGrid>
                      
                         <MudItem xs="6">
-                            <MudAvatar Style="height:70px; width:70px; font-size:2rem;">
-                                <MudImage Src="@imageDataUrl"></MudImage>
-                            </MudAvatar>
+                            @if (_processing)
+                            {
+                                <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+                            }
+                            else
+                            {
+                                <MudAvatar Style="height:70px; width:70px; font-size:2rem;">
+                                    <MudImage Src="@imageDataUrl"></MudImage>
+                                </MudAvatar>
+                           <br />
+                             
+                                        @if (!string.IsNullOrEmpty(shortcodef))
+                                    {
+                                        <MudImage Src="@($"https://irunsa.co.za/Imageroot/{shortcodef}")" Width="40" Height="30" Alt="Swedish Farm House" Elevation="25" Class="rounded-lg ma-4" />
+                                        
+                                        }
+                                
                     
-                     
+                            
+                            }
+                         
+
+                       
                         </MudItem>
+
+                  
                         <MudItem xs="6" >
                             <MudFileUpload Context="file" FilesChanged="OnFileSelected" T="IBrowserFile">
                                 <ButtonTemplate>
@@ -62,7 +85,10 @@
                                 </ButtonTemplate>
                             </MudFileUpload>
                         </MudItem>
-                     
+                        <MudItem xs="6">
+                       
+                
+                        </MudItem>
                     </MudGrid>
                     <MudAlert class="@invisi" Severity="Severity.Error">@errorMessage</MudAlert>
        
@@ -73,9 +99,14 @@
                     <MudTextField T="string" Label="Surname" Id="Surname" @bind-Value="athleteEntity.AthleteSurname" Disabled="@cantedit" Variant="Variant.Outlined"
                                   Adornment="Adornment.End" />
                     <ValidationMessage For="@(() => athleteEntity.AthleteSurname)" />
+                  
+                        <MudTextField DebounceInterval="1" OnDebounceIntervalElapsed="HandleIntervalElapsed" @bind-Value="selectedcountryname" HelperText="@searchTerm" Label="Country of nationality" Variant="Variant.Outlined" Adornment="Adornment.End"/>
 
-                    <MudTextField DebounceInterval="1" OnDebounceIntervalElapsed="HandleIntervalElapsed" @bind-Value="selectedcountryname" HelperText="@searchTerm" Label="Country of nationality" Variant="Variant.Outlined" Adornment="Adornment.End" />
                     
+               
+                 
+      
+                 
                     @if (searchResults != null)
                     {
                         <MudSimpleTable Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Style="overflow-x: auto;">
@@ -86,10 +117,10 @@
                                 @foreach (var country in searchResults)
                                 {
                                   
-                                        <tr @onclick=@(_ => SelectCountry(country.CountryID,country.CountryName))>
+                                        <tr @onclick=@(_ => SelectCountry(country.CountryID,country.CountryName,country.Shortcodeflag))>
 
                                             <td style="text-align:left">@($"{country.CountryName}")</td>
-                                            <td style="text-align:right"> <img width="30" src="@($"Countries/{country.Shortcodeflag}")" alt="Country Flag" /></td>
+                                            <td style="text-align:right"> <img width="30" src="@($"https://irunsa.co.za/Imageroot/{country.Shortcodeflag}")" alt="Country Flag" /></td>
 
                                         </tr>
                                   
@@ -114,6 +145,8 @@
                     <MudDatePicker Label="Date of Birth" Editable="true" @bind-Date="athleteEntity.DOB"  Placeholder="Select Date" />
               
                     <ValidationMessage For="@(() => athleteEntity.DOB)" />
+                    
+
 
 
                     <MudRadioGroup T="int" @bind-SelectedOption="athleteEntity.GenderId" Class="d-flex flex-column">
@@ -122,35 +155,7 @@
 
                         </MudRadioGroup>
 
-                               <MudTextField DebounceInterval="1" OnDebounceIntervalElapsed="HandleIntervalElapsed2" @bind-Value="selectedclubname" HelperText="@searchTerm2" Label="Associated Club" Variant="Variant.Outlined" Adornment="Adornment.End" />
-                    
-                    @if (searchResults2 != null)
-                    {
-                        <MudSimpleTable Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Style="overflow-x: auto;">
-
-                            <tbody>
-                                @if (searchResults2.Any())
-                                {
-                                    @foreach (var club in searchResults2)
-                                    {
-
-                                        <tr @onclick=@(_ => SelectClub(club.ClubId,club.ClubDescription))>
-
-                                            <td style="text-align:left">@($"{club.ClubDescription}")</td>
-                                            
-
-                                        </tr>
-                                    }
-
-                                }
-                                else
-
-                                {
-                                  
-                                }
-                            </tbody>
-                        </MudSimpleTable>
-                      }
+                         
 
                     <MudTextField T="string" Label="Email" Id="Email" @bind-Value="athleteEntity.Email" Disabled="@cantedit" Variant="Variant.Outlined"
                                   Adornment="Adornment.End" />
@@ -175,6 +180,7 @@
 
 @code {
     private AthleteEntity athleteEntity = new AthleteEntity();
+    private UserEntityRelationship userentityrelationship = new UserEntityRelationship();
     private bool ShowErrors;
     private IEnumerable<string>? Errors;
     private string searchTerm;
@@ -189,6 +195,7 @@
     string? selectedcountryname;
     int? selectedclubid;
     string? selectedclubname;
+    string? shortcodef;
     public DateTime? DOB { get; set; }
     DateTime? date = DateTime.Today;
     [Parameter]
@@ -197,12 +204,17 @@
     string invisi ="invisible";
     string errorMessage;
 
-  
+
     private IBrowserFile selectedFile;
     private string imageDataUrl;
     IList<IBrowserFile> files = new List<IBrowserFile>();
+    private bool _processing = false;
+
+
     private async void OnFileSelected(IBrowserFile file)
-    { 
+    {
+        selectedFile = file;
+        _processing = true;
         invisi = "invisible";
         if (file != null)
         {
@@ -213,6 +225,7 @@
             {
                 errorMessage = "File size exceeds the maximum allowed size.";
                 invisi = "";
+                _processing = false;
                 return;
             }
 
@@ -221,21 +234,24 @@
             string fileExtension = Path.GetExtension(file.Name).ToLower();
             if (!allowedExtensions.Any(ext => ext.Equals(fileExtension, StringComparison.OrdinalIgnoreCase)))
             {
-              
+
                 errorMessage = "Only JPEG, BMP, PNG, GIF, and TIFF file types are allowed.";
                 invisi = "";
+                _processing = false;
                 return;
             }
-        
+
             var buffer = new byte[file.Size];
             await file.OpenReadStream(maxAllowedSizeBytes).ReadAsync(buffer);
             var imageBase64 = Convert.ToBase64String(buffer);
             imageDataUrl = $"data:{file.ContentType};base64,{imageBase64}";
+            _processing = false;
             StateHasChanged(); // Update the UI
+
         }
     }
 
-  
+
     private async Task PrepopulateFormFromClaims()
     {
         if (ismine == "yes")
@@ -256,17 +272,17 @@
 
         {
             cantedit = false;
-            
+
         }
     }
 
-      
+
 
 
     // This gets called when the component is initialized
     protected override async Task OnInitializedAsync()
     {
-       
+
 
         await PrepopulateFormFromClaims();
         await base.OnInitializedAsync();
@@ -282,6 +298,8 @@
     }
     private List<Club> Search2(string value)
     {
+
+
         var responseTask = httpClient.GetStringAsync($"api/Club/AutoComplete/{value}");
         responseTask.Wait(); // Blocking call, which should be used with caution
 
@@ -302,7 +320,7 @@
         selectedclubname = country;
         searchResults2 = null;
     }
-    
+
     void HandleIntervalElapsed(string debouncedText)
     {
 
@@ -313,7 +331,7 @@
     }
     private List<Country> Search(string value)
     {
-        var responseTask = httpClient.GetStringAsync($"api/Country/Autocomplete/{value}");
+        var responseTask = httpClient.GetStringAsync($"api/Country/AutoComplete/{value}");
         responseTask.Wait(); // Blocking call, which should be used with caution
 
         if (responseTask.IsCompletedSuccessfully)
@@ -327,28 +345,103 @@
         }
     }
 
-    void SelectCountry(int id, string country)
+    void SelectCountry(int id, string country, string shortcodefs)
     {
         selectedcountryid = id;
         selectedcountryname = country;
+        shortcodef = shortcodefs;
         searchResults = null;
+
     }
- 
+
 
     private async Task HandleAthleteReg()
     {
         ShowErrors = false;
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        athleteEntity.UpdateDate = DateTime.Now;
+        athleteEntity.CreatedByUserId = user.FindFirst(ClaimTypes.Actor)?.Value;
+        athleteEntity.UpdatedByUserId = user.FindFirst(ClaimTypes.Actor)?.Value;
+        athleteEntity.Avatar = imageDataUrl;
+        athleteEntity.CreateDate = DateTime.Now;
+        athleteEntity.ClubEntityId = 0;
 
-        // Implement your registration logic here
-        // For now, let's just display the submitted athleteEntity data
-        Console.WriteLine("Registration submitted with the following data:");
-        Console.WriteLine($"ID/Passport: {athleteEntity.ID_Passport}");
-        Console.WriteLine($"Nationality ID: {athleteEntity.NationalityID}");
-        Console.WriteLine($"Gender ID: {athleteEntity.GenderId}");
-        Console.WriteLine($"Date of Birth: {athleteEntity.DOB}");
-        Console.WriteLine($"Club Entity ID: {athleteEntity.ClubEntityId}");
-        Console.WriteLine($"Email: {athleteEntity.Email}");
-        // ... Include other fields
+        // First, store the AthleteEntity
+        var response = await httpClient.PostAsJsonAsync("api/AthleteEntity/AddAthleteEntity", athleteEntity);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeAnonymousType(content, new { AthleteEntityId = 0 });
+            var athleteEntityId = result.AthleteEntityId;
+
+            // Handle the athleteEntityId as needed
+            Console.WriteLine("AthleteEntity added successfully. ID: " + athleteEntityId);
+            userentityrelationship.UpdateDate = DateTime.Now;
+            userentityrelationship.CreateDate = DateTime.Now;
+            userentityrelationship.UserId = user.FindFirst(ClaimTypes.Actor)?.Value;
+            userentityrelationship.EntiyId = athleteEntityId;
+
+
+            // Handle the attachment if a file is selected
+            if (selectedFile != null && selectedFile.OpenReadStream() != null)
+            {
+                // Create the multipart content with the file
+                var multipartContent = new MultipartFormDataContent();
+
+                // Convert IBrowserFile to StreamContent
+                var streamContent = new StreamContent(selectedFile.OpenReadStream())
+                    {
+                        Headers =
+                {
+                    ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                    {
+                        Name = "\"File\"",
+                        FileName = !string.IsNullOrEmpty(selectedFile.Name) ? selectedFile.Name : "defaultFileName.ext"
+                    },
+                    ContentType = new MediaTypeHeaderValue(selectedFile.ContentType)
+                }
+                    };
+
+                // Add the StreamContent to the form data
+                multipartContent.Add(streamContent, "File");
+
+                // Add other form data if needed
+                multipartContent.Add(new StringContent("1"), "EntityTypeId"); // Assuming entityTypeId for AthleteEntity is 1
+                multipartContent.Add(new StringContent(athleteEntityId.ToString()), "EntityId");
+                multipartContent.Add(new StringContent("2"), "AttachmentGroupId"); // Assuming attachmentGroupId is 2
+                multipartContent.Add(new StringContent("1"), "AttachmentTypeId"); // Assuming attachmentTypeId is 1
+                multipartContent.Add(new StringContent(user.FindFirst(ClaimTypes.Actor)?.Value), "CreatedByUserId");
+
+                // Call the AddAttachment method with the populated Attachment object and the file
+                var attachmentResponse = await httpClient.PostAsync("api/Attachment/AddAttachment", multipartContent);
+
+                if (!attachmentResponse.IsSuccessStatusCode)
+                {
+                    var problemContent = await attachmentResponse.Content.ReadAsStringAsync();
+                    var problemDetails = JsonConvert.DeserializeObject<ProblemDetails>(problemContent);
+
+                    Console.WriteLine("Error storing Attachment:");
+                    Console.WriteLine($"Status: {problemDetails.Status}");
+                    Console.WriteLine($"Title: {problemDetails.Title}");
+                    Console.WriteLine($"Detail: {problemDetails.Detail}");
+                    Console.WriteLine("Error storing Attachment");
+                }
+            }
+
+        }
+        else
+        {
+            // Handle error, maybe display an error message
+            Console.WriteLine("Error storing AthleteEntity. Status code: " + response.StatusCode);
+        }
+
+        Console.WriteLine("Registration submitted successfully!");
+        // ... You can perform further actions after successful registration
     }
-}
 
+
+
+
+}
