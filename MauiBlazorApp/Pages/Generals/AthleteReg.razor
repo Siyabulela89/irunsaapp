@@ -56,14 +56,15 @@
                                 <MudAvatar Style="height:70px; width:70px; font-size:2rem;">
                                     <MudImage Src="@imageDataUrl"></MudImage>
                                 </MudAvatar>
-                                <MudPaper Style="height:70px; align-items:center; width:70px; font-size:2rem;">
-                                <MudPaper Style="height:30px; align-items:center; width:40px; font-size:2rem;">
+                           <br />
+                             
                                         @if (!string.IsNullOrEmpty(shortcodef))
-                                        {
-                                            <MudImage Class="py-0 d-flex flex-1" Src="@($"https://irunsa.co.za/Imageroot/{shortcodef}")" Alt="#" />
+                                    {
+                                        <MudImage Src="@($"https://irunsa.co.za/Imageroot/{shortcodef}")" Width="40" Height="30" Alt="Swedish Farm House" Elevation="25" Class="rounded-lg ma-4" />
+                                        
                                         }
-                                 </MudPaper>
-                                </MudPaper>
+                                
+                    
                             
                             }
                          
@@ -154,35 +155,7 @@
 
                         </MudRadioGroup>
 
-                               <MudTextField DebounceInterval="1" OnDebounceIntervalElapsed="HandleIntervalElapsed2" @bind-Value="selectedclubname" HelperText="@searchTerm2" Label="Associated Club" Variant="Variant.Outlined" Adornment="Adornment.End" />
-                    
-                    @if (searchResults2 != null)
-                    {
-                        <MudSimpleTable Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Style="overflow-x: auto;">
-
-                            <tbody>
-                                @if (searchResults2.Any())
-                                {
-                                    @foreach (var club in searchResults2)
-                                    {
-
-                                        <tr @onclick=@(_ => SelectClub(club.ClubId,club.ClubDescription))>
-
-                                            <td style="text-align:left">@($"{club.ClubDescription}")</td>
-                                            
-
-                                        </tr>
-                                    }
-
-                                }
-                                else
-
-                                {
-                                  
-                                }
-                            </tbody>
-                        </MudSimpleTable>
-                      }
+                         
 
                     <MudTextField T="string" Label="Email" Id="Email" @bind-Value="athleteEntity.Email" Disabled="@cantedit" Variant="Variant.Outlined"
                                   Adornment="Adornment.End" />
@@ -391,7 +364,7 @@
         athleteEntity.UpdatedByUserId = user.FindFirst(ClaimTypes.Actor)?.Value;
         athleteEntity.Avatar = imageDataUrl;
         athleteEntity.CreateDate = DateTime.Now;
-        athleteEntity.ClubEntityId = 1;
+        athleteEntity.ClubEntityId = 0;
 
         // First, store the AthleteEntity
         var response = await httpClient.PostAsJsonAsync("api/AthleteEntity/AddAthleteEntity", athleteEntity);
