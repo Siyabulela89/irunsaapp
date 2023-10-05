@@ -8,6 +8,6 @@ namespace irunsaapp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ContactTypeId { get; set; }
-        public string? ContactTypeDescription { get; set; }
+        public string ContactTypeDescription { get; set; }
     }
 }

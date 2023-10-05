@@ -96,7 +96,7 @@ namespace irunsaapp.Services
             }
         }
 
-        public async Task<string> AddClubEntity(ClubEntity clubEntity)
+        public async Task<string> AddClubEntity(ClubEntityWithList clubEntity)
         {
             try
             {
@@ -107,12 +107,12 @@ namespace irunsaapp.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return null; // Or handle the error as needed
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"Failed to add club entity. StatusCode: {response.StatusCode}. Content: {errorContent}");
                 }
-                return "";
 
-                //var responseContent = await response.Content.ReadAsStringAsync();
-                //return JsonSerializer.Deserialize<ClubEntity>(responseContent);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return responseContent;
             }
             catch (Exception ex)
             {
@@ -120,5 +120,31 @@ namespace irunsaapp.Services
                 throw new ApplicationException("Failed to add club entity.", ex);
             }
         }
+
+        public async Task<string> UpdateClubEntity(ClubEntityWithList clubEntity)
+        {
+            try
+            {
+                var clubAsJson = JsonSerializer.Serialize(clubEntity);
+                var content = new StringContent(clubAsJson, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync("api/ClubEntity/UpdateClubEntity", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"Failed to update club entity. StatusCode: {response.StatusCode}. Content: {errorContent}");
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return responseContent;
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (log, rethrow, etc.)
+                throw new ApplicationException("Failed to update club entity.", ex);
+            }
+        }
+
     }
 }

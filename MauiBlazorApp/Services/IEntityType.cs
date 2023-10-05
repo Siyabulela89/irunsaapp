@@ -14,6 +14,7 @@ namespace irunsaapp.Services
         Task<List<EntityType>> GetAllEntityTypelist();
         Task<List<Club>> SearchClubs(string debouncedText);
         Task<List<Province>> GetAllProvinces();
-        Task<string> AddClubEntity(ClubEntity clubEntity);
+        Task<string> AddClubEntity(ClubEntityWithList clubEntity);
+        Task<string> UpdateClubEntity(ClubEntityWithList clubEntity);
     }
 }

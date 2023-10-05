@@ -1,5 +1,7 @@
 ﻿@page "/pages/Club/ClubEntity"
 
+@using System.Text;
+@using irunsaapp.Common;
 @using irunsaapp.Models;
 @using irunsaapp.Pages.Actions;
 @using irunsaapp.Pages.Components
@@ -20,6 +22,7 @@
 <MudGrid Class="mt-n15 pt-0">
     <MudItem xs="12">
         <EditForm Model="clubEntity" OnValidSubmit="SubmitClaim">
+
         <MudCard Elevation="1" Class="rounded-lg py-1">
             <MudCardContent>
                 @*
@@ -39,7 +42,7 @@
                 
                 @if (ShowSearchField)
                 {
-                <MudTextField DebounceInterval="1" OnDebounceIntervalElapsed="SearchClub" @bind-Value="selectedClubName" HelperText="@searchTerm" Label="Search Club Name" Variant="Variant.Outlined" Adornment="Adornment.End" />
+                <MudTextField DebounceInterval="1" OnDebounceIntervalElapsed="SearchClub" @bind-Value="bindValue" HelperText="@searchTerm" Label="Search Club Name" Variant="Variant.Outlined" Adornment="Adornment.End" />
                 }
 
                 @if (clubSearchList.Any())
@@ -47,11 +50,10 @@
                     <MudSimpleTable Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Style="overflow-x: auto;">
 
                     <tbody>
-                        @foreach (var club in clubSearchList)
+                        @foreach (var item in clubSearchList)
                         {
-                            <tr @onclick=@(_ => SelectClub(club.ClubId,club.ClubDescription))>
-
-                                <td style="text-align:left">@($"{club.ClubDescription}")</td>
+                            <tr @onclick=@(_ => SelectClub(item))>
+                                        <td style="text-align:left">@($"{item.ClubName}")</td>
                                 @*
                                     <td style="text-align:right"> <img width="30" src="@($"Countries/{club.Shortcodeflag}")" alt="Country Flag" /></td>
                                 *@
@@ -62,15 +64,26 @@
 
                     </MudSimpleTable>
                 }
-                else if (!clubSearchList.Any()) @* !string.IsNullOrEmpty(selectedClubName) *@
+                else if (!clubSearchList.Any())
                 {
                     @if (ShowClaimConfirmation)
                     {
+                        @if (clubEntity.ClubStatusId == (int)Enums.ClubStatus.ClaimRequested)//ClaimRequested //add enum
+                        {
+                        <MudAlert Severity="Severity.Error">This club has already been claimed, would you like to send a counter claim request?</MudAlert>
+                        <div class="mt-5 d-flex flex-grow-1 gap-4">
+                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="ClaimYes">Send reclaim</MudButton>
+                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="ClaimNo">Cancel</MudButton>
+                        </div>
+                        }
+                        else
+                        {
                         <MudAlert Severity="Severity.Error">Would you like to claim the club?</MudAlert>
                         <div class="mt-5 d-flex flex-grow-1 gap-4">
                             <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="ClaimYes">Claim</MudButton>
                             <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="ClaimNo">Cancel</MudButton>
-                        </div>                                        
+                        </div>
+                        }                        
                     }
 
                     @if (ShowAddClubConfirmation)
@@ -87,7 +100,7 @@
                 {
                     <div>
 
-                        <MudTextField Class="mt-3" T="string" Label="Club Name" Id="ClubName" @bind-Value="selectedClubName" Variant="Variant.Filled" Margin="Margin.Dense"
+                        <MudTextField Class="mt-3" T="string" Label="Club Name" Id="ClubName" @bind-Value="clubEntity.ClubName" Variant="Variant.Filled" Margin="Margin.Dense"
                                         AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle" />
                         <ValidationMessage For="@(() => clubEntity.ClubName)" />
 
@@ -126,8 +139,9 @@
 @code {
 
     private ClubEntity clubEntity = new ClubEntity();
-    private List<Club> clubList = new List<Club>();
-    private List<Club> clubSearchList = new List<Club>();
+    private ClubEntity currentClubEntity = new ClubEntity();
+    private List<ClubEntity> clubEntityList = new List<ClubEntity>();
+    private List<ClubEntity> clubSearchList = new List<ClubEntity>();
     private List<Province> provinceList;
     private List<string> associatedProvinceList = new List<string>();
 
@@ -140,10 +154,15 @@
     private bool ShowSearchField = true;
     private bool ShowClubEntityForm = false;
 
-    private int entityTypeId = 2; //ClubEntity, add enums
+    private int entityTypeId = (int)Enums.EntityType.Club;
     public string searchTerm;
-    int selectedClubEntityId;
-    string selectedClubName;
+
+    string bindValue;
+
+    //ClubEntity clubEntity;
+    // int selectedClubEntityId;
+    // string selectedClubName;
+    // int selectedClubStatusId;
 
     protected override void OnInitialized()
     {
@@ -156,19 +175,18 @@
 
     private void GetAllClubs()
     {
-        //clubList = await EntityTypeService.SearchClubs(debouncedText);
+        //clubEntityList = await EntityTypeService.SearchClubs(debouncedText);
 
-        var responseTask = httpClient.GetStringAsync($"api/Club/GetAll");
+        var responseTask = httpClient.GetStringAsync($"api/ClubEntity/GetAll");
         responseTask.Wait(); // Blocking call, which should be used with caution
 
         if (responseTask.IsCompletedSuccessfully)
         {
             var response = responseTask.Result;
 
-            clubList = JsonConvert.DeserializeObject<List<Club>>(response);
+            clubEntityList = JsonConvert.DeserializeObject<List<ClubEntity>>(response);
         }
     }
-
     private void GetAllProvinces()
     {
         //Get provinces here
@@ -187,10 +205,9 @@
             throw new Exception("Failed to get response.");
         }
     }
-
     private void GetAssociatedProvinces()
     {
-        var responseTask = httpClient.GetStringAsync($"api/ProvinceEntityRelationship/{entityTypeId}/{selectedClubEntityId}");
+        var responseTask = httpClient.GetStringAsync($"api/ProvinceEntityRelationship/{entityTypeId}/{clubEntity.ClubEntityId}");
         responseTask.Wait(); // Blocking call, which should be used with caution
 
         if (responseTask.IsCompletedSuccessfully)
@@ -204,12 +221,11 @@
             throw new Exception("Failed to get response.");
         }
     }
-
     private void SearchClub(string debouncedText)
     {
         if (!string.IsNullOrEmpty(debouncedText))
         {
-            clubSearchList = clubList.Where(x => x.ClubDescription.ToLower().Contains(debouncedText.ToLower())).ToList();
+            clubSearchList = clubEntityList.Where(x => x.ClubName.ToLower().Contains(debouncedText.ToLower())).ToList();
 
             if (clubSearchList.Any())
             {
@@ -222,6 +238,10 @@
                 ShowClaimConfirmation = false;
                 ShowAddClubConfirmation = true;
                 ShowClubEntityForm = false;
+
+                clubEntity.ClubName = bindValue;
+                currentClubEntity = clubEntity;
+                clubSearchList.Clear();
             }
         }
         else
@@ -229,61 +249,114 @@
             clubSearchList.Clear();
         }
     }
-
-    private void SelectClub(int clubId, string clubName)
+    private void SelectClub(ClubEntity selectedClubEntity)
     {
-        selectedClubEntityId = clubId;
-        selectedClubName = clubName;
+        clubEntity = selectedClubEntity;
+        // selectedClubEntityId = clubEntity.ClubEntityId;
+        // selectedClubName = clubEntity.ClubName;
+        // selectedClubStatusId = clubEntity.ClubStatusId;
 
         ShowClaimConfirmation = true;
         ShowAddClubConfirmation = false;
         ShowClubEntityForm = false;
-        ShowSearchField = true;
+        ShowSearchField = false;
 
         clubSearchList.Clear();
     }
-    private async Task ClaimYes()
+
+    private void ClaimYes()
     {
+        currentClubEntity.ClubName = clubEntity.ClubName;
+
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
         ShowClubEntityForm = true;
         ShowSearchField = false;
     }
-    private async Task ClaimNo()    
+    private void ClaimNo()    
     {
+        currentClubEntity = null;
+
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
         ShowClubEntityForm = false;
         ShowSearchField = true;
+
+
     }
-    private async Task AddClubYes()
+    private void AddClubYes()
     {
+        currentClubEntity = clubEntity;
+
+        currentClubEntity.ClubEntityId = 0;
+        currentClubEntity.ClubName = clubEntity.ClubName;
+        currentClubEntity.ClubRegistrationNumber = clubEntity.ClubRegistrationNumber;
+        currentClubEntity.ClubStatusId = (int)Enums.ClubStatus.ClaimRequested;
+
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
         ShowClubEntityForm = true;
         ShowSearchField = false;
     }
-    private async Task AddClubNo()
+    private void AddClubNo()
     {
+        currentClubEntity = null;
+
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
         ShowClubEntityForm = false;
         ShowSearchField = true;
     }
+
+    private void ClearFormFields()
+    {
+        //clubEntity.ClubEntityId = 0;
+        // clubEntity.ClubRegistrationNumber = "";
+        // clubEntity.ClubStatusId = 0;
+        //clubEntity.AssociatedProvinces.Clear();
+    }
+
     private async Task SubmitClaim()
     {       
         ShowErrors = false;
 
-        var result = await EntityTypeService.AddClubEntity(clubEntity);
+        //clubEntity.ClubEntityId = selectedClubEntityId;
+        //clubEntity.ClubName = selectedClubName;
+        //clubEntity.ClubRegistrationNumber = "";
+        clubEntity.ClubStatusId = (int)Enums.ClubStatus.ClaimRequested;
+        //clubEntity.ClubStatusReason = "";
+        clubEntity.CreatedByUserId = "1";
+        //clubEntity.CreateDate = DateTime.Now();
+        clubEntity.UpdatedByUserId = "1";
+        //clubEntity.UpdateDate = DateTime.Now();
 
+
+        //No need for this
+        //currentClubEntity = clubEntity;
+
+
+        ClubEntityWithList clubEntityWL = new ClubEntityWithList()
+        {
+            clubEntity = currentClubEntity,
+            associatedProvinces = associatedProvinceList
+        };
+
+        var result = "";
+
+        if (clubEntity.ClubEntityId == 0)
+        {
+            result = await EntityTypeService.AddClubEntity(clubEntityWL);
+        }
+        else
+        {
+            result = await EntityTypeService.UpdateClubEntity(clubEntityWL);
+        }
+        #region error handling section
         if (result == "")
         {
             var options = new DialogOptions() { CloseButton = false, NoHeader = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.BottomCenter };
             var parameters = new DialogParameters();
             var dialog = _dialogService.Show<SuccessBox>("", parameters, options);
-
-            //Move the navigation here
-            //NavigationManager.NavigateTo("RegCat");
         }
         else
         {
@@ -291,19 +364,14 @@
             ShowErrors = true;
             _processing = false;
         }
+        #endregion
+ 
     }
-    private async Task SubmitAssociatedProvinces()
+
+    private void CancelClaim()
     {
-        //Use associatedProvinceList values here
-        // associatedProvinceList
-  
+        currentClubEntity = null;
 
-
-
-
-    }
-    private async Task CancelClaim()
-    {
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
         ShowClubEntityForm = false;

@@ -11,8 +11,8 @@ namespace irunsaapp.Models
         public int ClubEntityId { get; set; }
         public string ClubName { get; set; }
         public string ClubRegistrationNumber { get; set; }
-        //public string AssociatedProvinces { get; set; } //See lookup list
         public int ClubStatusId { get; set; }
+        public string ClubStatusReason { get; set; }
         public string CreatedByUserId { get; set; }
         public DateTime CreateDate { get; set; }
         public string UpdatedByUserId { get; set; }

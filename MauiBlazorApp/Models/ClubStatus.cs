@@ -10,9 +10,10 @@ namespace irunsaapp.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ClubStatusId { get; set; }
         public string ClubStatusDescription { get; set; }
-      
+
         //Listed
-        //Claimed/Active
+        //ClaimRequested
+        //ClaimVerified
         //Disabled
         //Suspended
 
