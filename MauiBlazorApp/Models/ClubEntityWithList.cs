@@ -7,5 +7,6 @@ namespace irunsaapp.Models
     {
         public ClubEntity clubEntity { get; set; }
         public List<string> associatedProvinces { get; set; }
+        public List<ContactValue> contactDetails { get; set; }
     }
 }

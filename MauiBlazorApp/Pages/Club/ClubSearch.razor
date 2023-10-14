@@ -1,4 +1,4 @@
-﻿@page "/pages/Club/ClubEntity"
+﻿@page "/pages/Club/ClubSearch"
 
 @using System.Text;
 @using irunsaapp.Common;
@@ -73,7 +73,6 @@
                         <MudAlert Severity="Severity.Error">This club has already been claimed, would you like to send a counter claim request?</MudAlert>
                         <div class="mt-5 d-flex flex-grow-1 gap-4">
                             <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="ClaimYes">Send reclaim</MudButton>
-                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Secondary" Variant="Variant.Filled" OnClick="ClaimYes">Admin Request</MudButton>
                             <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="ClaimNo">Cancel</MudButton>
                         </div>
                         }
@@ -96,55 +95,6 @@
                         </div>
                     }
                 }
-
-                @if (ShowClubEntityForm)
-                {
-                    <div>
-
-                        <MudTextField Class="mt-3" T="string" Label="Club Name" Id="ClubName" @bind-Value="clubEntity.ClubName" Variant="Variant.Filled" Margin="Margin.Dense"
-                                        AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle" />
-                        <ValidationMessage For="@(() => clubEntity.ClubName)" />
-
-                        <MudTextField Class="mt-3" T="string" Label="Club Registration Number" Id="ClubRegistrationNumber" @bind-Value="clubEntity.ClubRegistrationNumber" Variant="Variant.Filled" Margin="Margin.Dense"
-                                        AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle" />
-                        <ValidationMessage For="@(() => clubEntity.ClubRegistrationNumber)" />
-                        
-                        <MudItem>
-                            <MudField Label="Associated Provinces" Variant="Variant.Filled" InnerPadding="false" Margin="Margin.Dense"
-                                        AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle">
-                                <MudRadioGroup Class="mt-3" T="string">
-
-                                    <CheckBoxList Data="@provinceList" 
-                                        TextField="@((item)=>item.ProvinceName)"
-                                        ValueField="@((item)=>item.ProvinceId)" 
-                                        SelectedValues="@associatedProvinceList" />
-
-                                </MudRadioGroup>
-                            </MudField> 
-                        </MudItem>
-
-                        <!-- Dynamic MudTextField Rows -->
-                        @if (contactValueList.Any())
-                        {
-                            @foreach (ContactValue item in contactValueList)
-                            {
-                                <MudTextField Class="mt-3" T="string" Label="@item.ContactTypeDescription"
-                                        Id="@item.ContactTypeId" Variant="Variant.Filled" Margin="Margin.Dense"
-                                        AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle"
-                                        @bind-Value="@item.ContactDescription"></MudTextField>
-
-                                <!-- Add Contact Button -->
-                                <MudButton Class="mt-3" DisableElevation Variant="Variant.Outlined"
-                                    @onclick="() => AddContactField(item)">+</MudButton>
-                            }
-                        }
-
-                        <div class="mt-5 d-flex flex-grow-1 gap-4">
-                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitClaim">Submit Claim</MudButton>
-                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="CancelClaim">Cancel Claim</MudButton>
-                        </div>
-                    </div>
-                }
           
             </MudCardContent>
         </MudCard>
@@ -159,15 +109,14 @@
     private ClubEntity currentClubEntity = new ClubEntity();
     private List<ClubEntity> clubEntityList = new List<ClubEntity>();
     private List<ClubEntity> clubSearchList = new List<ClubEntity>();
-    private List<Province> provinceList;
-    private List<string> associatedProvinceList = new List<string>();
-    private List<ContactType> contactTypeList;
-    private List<ContactValue> contactValueList;
+
 
     private bool dense = true;
     private bool hover = true;
     private bool striped = true;
     private bool bordered = false;
+
+
     private bool ShowClaimConfirmation = false;
     private bool ShowAddClubConfirmation = false;
     private bool ShowSearchField = true;
@@ -178,19 +127,10 @@
 
     string bindValue;
 
-    //ClubEntity clubEntity;
-    // int selectedClubEntityId;
-    // string selectedClubName;
-    // int selectedClubStatusId;
-
     protected override void OnInitialized()
     {
-        // Load clubList here when the component is initialized.
+        // Load clubList here
         GetAllClubs();
-        // Call GetAllProvinces() here to load provinces
-        GetAllProvinces();
-        // Call GetAllContatTypes() here to load contact types
-        GetAllContactTypes();
 
     }
 
@@ -208,65 +148,7 @@
             clubEntityList = JsonConvert.DeserializeObject<List<ClubEntity>>(response);
         }
     }
-    private void GetAllProvinces()
-    {
-        //Get provinces here
-        //return await EntityTypeService.GetAllProvinces();
 
-        var responseTask = httpClient.GetStringAsync($"api/Province/GetAll");
-        responseTask.Wait(); // Blocking call, which should be used with caution
-
-        if (responseTask.IsCompletedSuccessfully)
-        {
-            var response = responseTask.Result;
-            provinceList = JsonConvert.DeserializeObject<List<Province>>(response);
-        }
-        else
-        {
-            throw new Exception("Failed to get response.");
-        }
-    }
-    private void GetAllContactTypes()
-    {
-        //Get provinces here
-        //return await EntityTypeService.GetAllProvinces();
-
-        var responseTask = httpClient.GetStringAsync($"api/ContactType/GetAll");
-        responseTask.Wait(); // Blocking call, which should be used with caution
-
-        if (responseTask.IsCompletedSuccessfully)
-        {
-            var response = responseTask.Result;
-            contactTypeList = JsonConvert.DeserializeObject<List<ContactType>>(response);
-            contactValueList = contactTypeList.Select(x=> 
-                                                      new ContactValue
-                                                      {
-                                                          ContactTypeId = x.ContactTypeId,
-                                                          ContactTypeDescription = x.ContactTypeDescription,
-                                                          ContactDescription = ""
-                                                      }).ToList();
-        }
-        else
-        {
-            throw new Exception("Failed to get response.");
-        }
-    }
-    private void GetAssociatedProvinces()
-    {
-        var responseTask = httpClient.GetStringAsync($"api/ProvinceEntityRelationship/{entityTypeId}/{clubEntity.ClubEntityId}");
-        responseTask.Wait(); // Blocking call, which should be used with caution
-
-        if (responseTask.IsCompletedSuccessfully)
-        {
-            var response = responseTask.Result;
-
-            associatedProvinceList = JsonConvert.DeserializeObject<List<string>>(response);        
-        }
-        else
-        {
-            throw new Exception("Failed to get response.");
-        }
-    }
     private void SearchClub(string debouncedText)
     {
         if (!string.IsNullOrEmpty(debouncedText))
@@ -345,78 +227,6 @@
         ShowSearchField = false;
     }
     private void AddClubNo()
-    {
-        currentClubEntity = null;
-
-        ShowClaimConfirmation = false;
-        ShowAddClubConfirmation = false;
-        ShowClubEntityForm = false;
-        ShowSearchField = true;
-    }
-
-    private void AddContactField(ContactValue item)
-    {
-        var newContactValue = new ContactValue { ContactTypeId = item.ContactTypeId, ContactTypeDescription = item.ContactTypeDescription, ContactDescription = "" };
-        contactValueList.Add(newContactValue);
-    }
-
-    private void ClearFormFields()
-    {
-        //clubEntity.ClubEntityId = 0;
-        // clubEntity.ClubRegistrationNumber = "";
-        // clubEntity.ClubStatusId = 0;
-        //clubEntity.AssociatedProvinces.Clear();
-    }
-
-    private async Task SubmitClaim()
-    {       
-        ShowErrors = false;
-
-        //clubEntity.ClubEntityId = selectedClubEntityId;
-        //clubEntity.ClubName = selectedClubName;
-        //clubEntity.ClubRegistrationNumber = "";
-        clubEntity.ClubStatusId = (int)Enums.ClubStatus.ClaimRequested;
-        //clubEntity.ClubStatusReason = "";
-        clubEntity.CreatedByUserId = "1";
-        //clubEntity.CreateDate = DateTime.Now();
-        clubEntity.UpdatedByUserId = "1";
-        //clubEntity.UpdateDate = DateTime.Now();
-
-        ClubEntityWithList clubEntityWL = new ClubEntityWithList()
-        {
-            clubEntity = currentClubEntity,
-            associatedProvinces = associatedProvinceList,
-                contactDetails = contactValueList
-        };
-
-        var result = "";
-
-        if (clubEntity.ClubEntityId == 0)
-        {
-            result = await EntityTypeService.AddClubEntity(clubEntityWL);
-        }
-        else
-        {
-            result = await EntityTypeService.UpdateClubEntity(clubEntityWL);
-        }
-        #region error handling section
-        if (result == "")
-        {
-            var options = new DialogOptions() { CloseButton = false, NoHeader = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.BottomCenter };
-            var parameters = new DialogParameters();
-            var dialog = _dialogService.Show<SuccessBox>("", parameters, options);
-        }
-        else
-        {
-            //Errors = "";
-            ShowErrors = true;
-            _processing = false;
-        }
-        #endregion
- 
-    }
-
-    private void CancelClaim()
     {
         currentClubEntity = null;
 
