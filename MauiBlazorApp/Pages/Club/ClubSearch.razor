@@ -192,9 +192,6 @@
     private void SelectClub(ClubEntity selectedClubEntity)
     {
         clubEntity = selectedClubEntity;
-        // selectedClubEntityId = clubEntity.ClubEntityId;
-        // selectedClubName = clubEntity.ClubName;
-        // selectedClubStatusId = clubEntity.ClubStatusId;
 
         ShowClaimConfirmation = true;
         ShowAddClubConfirmation = false;
@@ -206,11 +203,8 @@
 
     private void ClaimYes()
     {
-        //currentClubEntity.ClubName = clubEntity.ClubName;
-
         //Redirect to Claim Page with parameters
         NavigationManager.NavigateTo($"/pages/Club/ClubEntityAddEdit/{Uri.EscapeDataString(JsonConvert.SerializeObject(clubEntity))}");
-
     }
     private void ClaimNo()    
     {
@@ -218,47 +212,40 @@
 
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
-        //ShowClubEntityForm = false;
         ShowSearchField = true;
-
-
     }
     private void CounterClaimYes()
     {
         //Redirect to Counter Claim Page
-        NavigationManager.NavigateTo("/pages/Club/CounterClaim");
-
+        NavigationManager.NavigateTo($"/pages/Club/CounterClaim/{Uri.EscapeDataString(JsonConvert.SerializeObject(clubEntity))}");
     }
     private void CounterClaimNo()
     {
+        currentClubEntity = null;
 
+        ShowClaimConfirmation = false;
+        ShowAddClubConfirmation = false;
+        ShowSearchField = true;
     }
     private void AdminRequestYes()
     {
         //Redirect to Club admin request Page
-        NavigationManager.NavigateTo("/pages/Club/ClubAdminRequest");
+        NavigationManager.NavigateTo($"/pages/Club/ClubAdminRequest/{Uri.EscapeDataString(JsonConvert.SerializeObject(clubEntity))}");
     }
     private void AdminRequestNo()
     {
-
-    }
-    private void AddClubYes()
-    {
-        // currentClubEntity = clubEntity;
-
-        // currentClubEntity.ClubEntityId = 0;
-        // currentClubEntity.ClubName = clubEntity.ClubName;
-        // currentClubEntity.ClubRegistrationNumber = clubEntity.ClubRegistrationNumber;
-        // currentClubEntity.ClubStatusId = (int)Enums.ClubStatus.ClaimRequested;
-
-
-        //Redirect to Claim Page
-        NavigationManager.NavigateTo("/pages/Club/ClubEntityAddEdit");
+        currentClubEntity = null;
 
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
-        //ShowClubEntityForm = true;
-        ShowSearchField = false;
+        ShowSearchField = true;
+    }
+    private void AddClubYes()
+    {
+        //create empty clubEntity
+
+        //Redirect to Claim Page
+        NavigationManager.NavigateTo($"/pages/Club/ClubEntityAddEdit/{Uri.EscapeDataString(JsonConvert.SerializeObject(clubEntity))}");
     }
     private void AddClubNo()
     {
@@ -266,17 +253,21 @@
 
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
-        //ShowClubEntityForm = false;
         ShowSearchField = true;
     }
+    
     private void EnquirySendYes()
     {
         //Redirect to Claim Page
-        NavigationManager.NavigateTo("/pages/EnquirySend");
+        NavigationManager.NavigateTo($"/pages/EnquirySend/{Uri.EscapeDataString(JsonConvert.SerializeObject(clubEntity))}");
     }
     private void EnquirySendNo()
     {
+        currentClubEntity = null;
 
+        ShowClaimConfirmation = false;
+        ShowAddClubConfirmation = false;
+        ShowSearchField = true;
     }
 
     
