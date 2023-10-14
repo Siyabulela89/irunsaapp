@@ -21,14 +21,10 @@
 
 <MudGrid Class="mt-n15 pt-0">
     <MudItem xs="12">
-        <EditForm Model="clubEntity" OnValidSubmit="SubmitClaim">
+        <EditForm Model="clubEntity">
 
         <MudCard Elevation="1" Class="rounded-lg py-1">
             <MudCardContent>
-                @*
-                <MudText Color="Color.Default" Typo="Typo.h6" Style="font-weight: 600;">Sign Up</MudText>
-                <MudText Class="mb-5" Typo="Typo.body2">Get started in minutes</MudText> 
-                *@
 
                 @if (ShowErrors)
                 {
@@ -68,22 +64,38 @@
                 {
                     @if (ShowClaimConfirmation)
                     {
-                        @if (clubEntity.ClubStatusId == (int)Enums.ClubStatus.ClaimRequested)//ClaimRequested //add enum
+                        @if (clubEntity.ClubStatusId == (int)Enums.ClubStatus.Listed)
                         {
-                        <MudAlert Severity="Severity.Error">This club has already been claimed, would you like to send a counter claim request?</MudAlert>
-                        <div class="mt-5 d-flex flex-grow-1 gap-4">
-                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="ClaimYes">Send reclaim</MudButton>
-                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="ClaimNo">Cancel</MudButton>
-                        </div>
+                            <MudAlert Severity="Severity.Error">Would you like to claim the club?</MudAlert>
+                            <div class="mt-5 d-flex flex-grow-1 gap-4">
+                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="ClaimYes">Claim</MudButton>
+                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="ClaimNo">Cancel</MudButton>
+                            </div>
+                        }
+                        else if (clubEntity.ClubStatusId == (int)Enums.ClubStatus.ClaimRequested)
+                        {
+                            <MudAlert Severity="Severity.Error">This club has already been claimed, would you like to send a counter claim request?</MudAlert>
+                            <div class="mt-5 d-flex flex-grow-1 gap-4">
+                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="CounterClaimYes">Send reclaim</MudButton>
+                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="CounterClaimNo">Cancel</MudButton>
+                            </div>
+                        }
+                        else if (clubEntity.ClubStatusId == (int)Enums.ClubStatus.ClaimVerified)
+                        {
+                            <MudAlert Severity="Severity.Error">This club has been verified, would you like to request Admin access?</MudAlert>
+                            <div class="mt-5 d-flex flex-grow-1 gap-4">
+                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="AdminRequestYes">Request</MudButton>
+                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="AdminRequestNo">Cancel</MudButton>
+                            </div>
                         }
                         else
                         {
-                        <MudAlert Severity="Severity.Error">Would you like to claim the club?</MudAlert>
-                        <div class="mt-5 d-flex flex-grow-1 gap-4">
-                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="ClaimYes">Claim</MudButton>
-                            <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="ClaimNo">Cancel</MudButton>
-                        </div>
-                        }                        
+                            <MudAlert Severity="Severity.Error">This club has been disabled/suspended, contact Admin for more detail</MudAlert>
+                            <div class="mt-5 d-flex flex-grow-1 gap-4">
+                                <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="EnquirySendYes">Send Enquiry</MudButton>
+                                    <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="EnquirySendNo">Cancel</MudButton>
+                            </div>
+                        }
                     }
 
                     @if (ShowAddClubConfirmation)
@@ -194,12 +206,11 @@
 
     private void ClaimYes()
     {
-        currentClubEntity.ClubName = clubEntity.ClubName;
+        //currentClubEntity.ClubName = clubEntity.ClubName;
 
-        ShowClaimConfirmation = false;
-        ShowAddClubConfirmation = false;
-        ShowClubEntityForm = true;
-        ShowSearchField = false;
+        //Redirect to Claim Page with parameters
+        NavigationManager.NavigateTo($"/pages/Club/ClubEntityAddEdit/{Uri.EscapeDataString(JsonConvert.SerializeObject(clubEntity))}");
+
     }
     private void ClaimNo()    
     {
@@ -207,23 +218,46 @@
 
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
-        ShowClubEntityForm = false;
+        //ShowClubEntityForm = false;
         ShowSearchField = true;
 
 
     }
+    private void CounterClaimYes()
+    {
+        //Redirect to Counter Claim Page
+        NavigationManager.NavigateTo("/pages/Club/CounterClaim");
+
+    }
+    private void CounterClaimNo()
+    {
+
+    }
+    private void AdminRequestYes()
+    {
+        //Redirect to Club admin request Page
+        NavigationManager.NavigateTo("/pages/Club/ClubAdminRequest");
+    }
+    private void AdminRequestNo()
+    {
+
+    }
     private void AddClubYes()
     {
-        currentClubEntity = clubEntity;
+        // currentClubEntity = clubEntity;
 
-        currentClubEntity.ClubEntityId = 0;
-        currentClubEntity.ClubName = clubEntity.ClubName;
-        currentClubEntity.ClubRegistrationNumber = clubEntity.ClubRegistrationNumber;
-        currentClubEntity.ClubStatusId = (int)Enums.ClubStatus.ClaimRequested;
+        // currentClubEntity.ClubEntityId = 0;
+        // currentClubEntity.ClubName = clubEntity.ClubName;
+        // currentClubEntity.ClubRegistrationNumber = clubEntity.ClubRegistrationNumber;
+        // currentClubEntity.ClubStatusId = (int)Enums.ClubStatus.ClaimRequested;
+
+
+        //Redirect to Claim Page
+        NavigationManager.NavigateTo("/pages/Club/ClubEntityAddEdit");
 
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
-        ShowClubEntityForm = true;
+        //ShowClubEntityForm = true;
         ShowSearchField = false;
     }
     private void AddClubNo()
@@ -232,10 +266,20 @@
 
         ShowClaimConfirmation = false;
         ShowAddClubConfirmation = false;
-        ShowClubEntityForm = false;
+        //ShowClubEntityForm = false;
         ShowSearchField = true;
     }
+    private void EnquirySendYes()
+    {
+        //Redirect to Claim Page
+        NavigationManager.NavigateTo("/pages/EnquirySend");
+    }
+    private void EnquirySendNo()
+    {
 
+    }
+
+    
     private bool ShowErrors;
     private IEnumerable<string>? Errors;
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
