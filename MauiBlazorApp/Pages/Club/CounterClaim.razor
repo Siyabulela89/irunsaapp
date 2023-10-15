@@ -149,6 +149,22 @@
             throw new Exception("Failed to get response.");
         }
     }
+    private void GetAssociatedProvinces()
+    {
+        var responseTask = httpClient.GetStringAsync($"api/ProvinceEntityRelationship/GetById/{entityTypeId}/{clubEntity.ClubEntityId}");
+        responseTask.Wait(); // Blocking call, which should be used with caution
+
+        if (responseTask.IsCompletedSuccessfully)
+        {
+            var response = responseTask.Result;
+
+            associatedProvinceList = JsonConvert.DeserializeObject<List<string>>(response);        
+        }
+        else
+        {
+            throw new Exception("Failed to get response.");
+        }
+    }
     private void GetAllContactTypes()
     {
         //Get provinces here
@@ -167,22 +183,6 @@
                                                           ContactTypeDescription = x.ContactTypeDescription,
                                                           ContactDescription = ""
                                                       }).ToList();
-        }
-        else
-        {
-            throw new Exception("Failed to get response.");
-        }
-    }
-    private void GetAssociatedProvinces()
-    {
-        var responseTask = httpClient.GetStringAsync($"api/ProvinceEntityRelationship/GetById/{entityTypeId}/{clubEntity.ClubEntityId}");
-        responseTask.Wait(); // Blocking call, which should be used with caution
-
-        if (responseTask.IsCompletedSuccessfully)
-        {
-            var response = responseTask.Result;
-
-            associatedProvinceList = JsonConvert.DeserializeObject<List<string>>(response);        
         }
         else
         {

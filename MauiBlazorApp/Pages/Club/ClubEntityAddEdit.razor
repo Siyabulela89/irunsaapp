@@ -96,8 +96,9 @@
     private ClubEntity clubEntity = new ClubEntity();
     private List<Province> provinceList;
     private List<string> associatedProvinceList = new List<string>();
-    private List<ContactType> contactTypeList;
-    private List<ContactValue> contactValueList;
+    private List<ContactType> contactTypeList = new List<ContactType>();
+    private List<ContactValue> contactValueList = new List<ContactValue>();
+    private List<ContactDetail> savedContactList = new List<ContactDetail>();
 
     private int entityTypeId;
 
@@ -117,13 +118,15 @@
 
         // Deserialize the JSON string back to ClubEntity
         clubEntity = JsonConvert.DeserializeObject<ClubEntity>(Uri.UnescapeDataString(clubEntityJson));
-        
+
         entityTypeId = (int)Enums.EntityType.Club;
 
         if (clubEntity.ClubStatusId != (int)Enums.ClubStatus.Listed)
         {
-            // Call AssociatedProvinces() here to load selected provinces
+            // Call AssociatedProvinces() here to load saved provinces
             GetAssociatedProvinces();
+            // Call SavedContacts() here to load saved contacts
+            GetSavedContacts();
         }
 
         // Call GetAllContatTypes() here to load contact types
@@ -131,63 +134,46 @@
 
     }
 
-    private void GetAllProvinces()
+    private async Task GetAllProvinces()
     {
-        //Get provinces here
-        //return await EntityTypeService.GetAllProvinces();
-
-        var responseTask = httpClient.GetStringAsync($"api/Province/GetAll");
-        responseTask.Wait(); // Blocking call, which should be used with caution
-
-        if (responseTask.IsCompletedSuccessfully)
-        {
-            var response = responseTask.Result;
-            provinceList = JsonConvert.DeserializeObject<List<Province>>(response);
-        }
-        else
-        {
-            throw new Exception("Failed to get response.");
-        }
+        provinceList = await EntityTypeService.GetAllProvinces();
+        StateHasChanged();
     }
-    private void GetAllContactTypes()
+    
+    private async Task GetAssociatedProvinces()
     {
-        //Get provinces here
-        //return await EntityTypeService.GetAllProvinces();
-
-        var responseTask = httpClient.GetStringAsync($"api/ContactType/GetAll");
-        responseTask.Wait(); // Blocking call, which should be used with caution
-
-        if (responseTask.IsCompletedSuccessfully)
-        {
-            var response = responseTask.Result;
-            contactTypeList = JsonConvert.DeserializeObject<List<ContactType>>(response);
-            contactValueList = contactTypeList.Select(x=> new ContactValue
-                                                      {
-                                                          ContactTypeId = x.ContactTypeId,
-                                                          ContactTypeDescription = x.ContactTypeDescription,
-                                                          ContactDescription = ""
-                                                      }).ToList();
-        }
-        else
-        {
-            throw new Exception("Failed to get response.");
-        }
+        associatedProvinceList = await EntityTypeService.GetAssociatedProvinces(entityTypeId, clubEntity.ClubEntityId);
+        StateHasChanged();
     }
-    private void GetAssociatedProvinces()
+
+    private async Task GetAllContactTypes()
     {
-        var responseTask = httpClient.GetStringAsync($"api/ProvinceEntityRelationship/GetById/{entityTypeId}/{clubEntity.ClubEntityId}");
-        responseTask.Wait(); // Blocking call, which should be used with caution
+        contactTypeList = await EntityTypeService.GetAllContactTypes();
 
-        if (responseTask.IsCompletedSuccessfully)
-        {
-            var response = responseTask.Result;
+        contactValueList = contactTypeList
+            .Where(ct => !savedContactList.Any(sc => sc.ContactTypeId == ct.ContactTypeId))
+            .Select(contactType => new ContactValue
+                {
+                    ContactTypeId = contactType.ContactTypeId,
+                    ContactTypeDescription = contactType.ContactTypeDescription,
+                    ContactDescription = string.Empty // Set default value if needed
+                })
+            .Concat(savedContactList
+                    .Select(sc => new ContactValue
+                        {
+                            ContactTypeId = sc.ContactTypeId,
+                            ContactTypeDescription = contactTypeList
+                                    .FirstOrDefault(ct => ct.ContactTypeId == sc.ContactTypeId)?.ContactTypeDescription
+                                    ?? string.Empty, // Set default value if needed
+                            ContactDescription = sc.ContactDescription
+                        })
+                    ).ToList();
+        StateHasChanged();
+    }
 
-            associatedProvinceList = JsonConvert.DeserializeObject<List<string>>(response);        
-        }
-        else
-        {
-            throw new Exception("Failed to get response.");
-        }
+    private void GetSavedContacts()
+    {        
+        savedContactList = EntityTypeService.GetSavedContacts(entityTypeId, clubEntity.ClubEntityId);
     }
 
     private void AddContactField(ContactValue item)
@@ -211,7 +197,7 @@
         {
             clubEntity = clubEntity,
             associatedProvinces = associatedProvinceList,
-            contactDetails = contactValueList
+            contactDetails = contactValueList.Where(x=> !string.IsNullOrEmpty(x.ContactDescription)).ToList()
         };
 
         var result = "";
@@ -224,6 +210,7 @@
         {
             result = await EntityTypeService.UpdateClubEntity(clubEntityWL);
         }
+
         #region error handling section
         if (result == "")
         {

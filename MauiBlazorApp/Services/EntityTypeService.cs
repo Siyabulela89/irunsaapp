@@ -67,32 +67,64 @@ namespace irunsaapp.Services
             }
         }
 
-
-        public async Task<List<Club>> SearchClubs(string debouncedText)
-        {
-            try
-            {
-                var response = await _httpClient.GetStringAsync($"api/Club/AutoComplete/{debouncedText}");
-                return JsonSerializer.Deserialize<List<Club>>(response);
-            }
-            catch (Exception ex)
-            {
-                // Handle the exception (log, rethrow, etc.)
-                throw new ApplicationException("Failed to get club list.", ex);
-            }
-        }
-
         public async Task<List<Province>> GetAllProvinces()
         {
             try
             {
                 var response = await _httpClient.GetStringAsync("api/Province/GetAll");
-                return JsonSerializer.Deserialize<List<Province>>(response);
+
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Province>>(response);
             }
             catch (Exception ex)
             {
                 // Handle the exception (log, rethrow, etc.)
                 throw new ApplicationException("Failed to get provinces list.", ex);
+            }
+        }
+
+        public async Task<List<string>> GetAssociatedProvinces(int entityTypeId, int clubEntityId)
+        {
+            try
+            {
+                var response = await _httpClient.GetStringAsync($"api/ProvinceEntityRelationship/GetById/{entityTypeId}/{clubEntityId}");
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(response);
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (log, rethrow, etc.)
+                throw new ApplicationException("Failed to get associated provinces list.", ex);
+            }
+        }
+
+        public async Task<List<ContactType>> GetAllContactTypes()
+        {
+            try
+            {
+                var response = await _httpClient.GetStringAsync("api/ContactType/GetAll");
+
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<List<ContactType>>(response);
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (log, rethrow, etc.)
+                throw new ApplicationException("Failed to get contact type list.", ex);
+            }
+        }
+
+        public List<ContactDetail> GetSavedContacts(int entityTypeId, int clubEntityId)
+        {
+            try
+            {
+                var responseTask = _httpClient.GetStringAsync($"api/ContactDetail/GetById/{entityTypeId}/{clubEntityId}");
+                responseTask.Wait();  // This is blocking, use cautiously
+
+                var response = responseTask.Result;
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<List<ContactDetail>>(response);
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (log, rethrow, etc.)
+                throw new ApplicationException("Failed to get contact type list.", ex);
             }
         }
 

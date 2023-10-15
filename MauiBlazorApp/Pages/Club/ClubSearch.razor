@@ -217,7 +217,8 @@
     private void CounterClaimYes()
     {
         //Redirect to Counter Claim Page
-        NavigationManager.NavigateTo($"/pages/Club/CounterClaim/{Uri.EscapeDataString(JsonConvert.SerializeObject(clubEntity))}");
+        //NavigationManager.NavigateTo($"/pages/Club/CounterClaim/{Uri.EscapeDataString(JsonConvert.SerializeObject(clubEntity))}");
+        NavigationManager.NavigateTo($"/pages/Club/ClubEntityAddEdit/{Uri.EscapeDataString(JsonConvert.SerializeObject(clubEntity))}");
     }
     private void CounterClaimNo()
     {
