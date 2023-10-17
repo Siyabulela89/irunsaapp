@@ -46,36 +46,6 @@
                                     AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle" />
                     <ValidationMessage For="@(() => clubEntity.ClubRegistrationNumber)" />
                         
-                    <MudItem>
-                        <MudField Label="Associated Provinces" Variant="Variant.Filled" InnerPadding="false" Margin="Margin.Dense"
-                                    AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle">
-                            <MudRadioGroup Class="mt-3" T="string">
-
-                                <CheckBoxList Data="@provinceList" 
-                                    TextField="@((item)=>item.ProvinceName)"
-                                    ValueField="@((item)=>item.ProvinceId)" 
-                                    SelectedValues="@associatedProvinceList" />
-
-                            </MudRadioGroup>
-                        </MudField> 
-                    </MudItem>
-
-                    <!-- Dynamic MudTextField Rows -->
-                    @if (contactValueList.Any())
-                    {
-                        @foreach (ContactValue item in contactValueList)
-                        {
-                            <MudTextField Class="mt-3" T="string" Label="@item.ContactTypeDescription"
-                                    Id="@item.ContactTypeId" Variant="Variant.Filled" Margin="Margin.Dense"
-                                    AdornmentColor="Color.Primary" Adornment="Adornment.Start" AdornmentIcon="@Icons.TwoTone.AccountCircle"
-                                    @bind-Value="@item.ContactDescription"></MudTextField>
-
-                            <!-- Add Contact Button -->
-                            <MudButton Class="mt-3" DisableElevation Variant="Variant.Outlined"
-                                @onclick="() => AddContactField(item)">+</MudButton>
-                        }
-                    }
-
                     <div class="mt-5 d-flex flex-grow-1 gap-4">
                         <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitClaim">Submit Claim</MudButton>
                         <MudButton Class="flex-1 rounded-lg" DisableElevation Color="Color.Error" Variant="Variant.Filled" OnClick="CancelClaim">Back to Club Search</MudButton>
@@ -87,17 +57,13 @@
     </MudItem>
 </MudGrid>
 
-
  @code {
 
     [Parameter]
     public string clubEntityJson { get; set; }
 
     private ClubEntity clubEntity = new ClubEntity();
-    private List<Province> provinceList;
-    private List<string> associatedProvinceList = new List<string>();
-    private List<ContactType> contactTypeList;
-    private List<ContactValue> contactValueList;
+
 
     private int entityTypeId;
 
@@ -112,118 +78,28 @@
 
     protected override void OnInitialized()
     {
-        // Call GetAllProvinces() here to load provinces
-        GetAllProvinces();
-
         // Deserialize the JSON string back to ClubEntity
         clubEntity = JsonConvert.DeserializeObject<ClubEntity>(Uri.UnescapeDataString(clubEntityJson));
-        
+
         entityTypeId = (int)Enums.EntityType.Club;
 
-        if (clubEntity.ClubStatusId != (int)Enums.ClubStatus.Listed)
-        {
-            // Call AssociatedProvinces() here to load selected provinces
-            GetAssociatedProvinces();
-        }
-
-        // Call GetAllContatTypes() here to load contact types
-        GetAllContactTypes();
-
-    }
-
-    private void GetAllProvinces()
-    {
-        //Get provinces here
-        //return await EntityTypeService.GetAllProvinces();
-
-        var responseTask = httpClient.GetStringAsync($"api/Province/GetAll");
-        responseTask.Wait(); // Blocking call, which should be used with caution
-
-        if (responseTask.IsCompletedSuccessfully)
-        {
-            var response = responseTask.Result;
-            provinceList = JsonConvert.DeserializeObject<List<Province>>(response);
-        }
-        else
-        {
-            throw new Exception("Failed to get response.");
-        }
-    }
-    private void GetAllContactTypes()
-    {
-        //Get provinces here
-        //return await EntityTypeService.GetAllProvinces();
-
-        var responseTask = httpClient.GetStringAsync($"api/ContactType/GetAll");
-        responseTask.Wait(); // Blocking call, which should be used with caution
-
-        if (responseTask.IsCompletedSuccessfully)
-        {
-            var response = responseTask.Result;
-            contactTypeList = JsonConvert.DeserializeObject<List<ContactType>>(response);
-            contactValueList = contactTypeList.Select(x=> new ContactValue
-                                                      {
-                                                          ContactTypeId = x.ContactTypeId,
-                                                          ContactTypeDescription = x.ContactTypeDescription,
-                                                          ContactDescription = ""
-                                                      }).ToList();
-        }
-        else
-        {
-            throw new Exception("Failed to get response.");
-        }
-    }
-    private void GetAssociatedProvinces()
-    {
-        var responseTask = httpClient.GetStringAsync($"api/ProvinceEntityRelationship/GetById/{entityTypeId}/{clubEntity.ClubEntityId}");
-        responseTask.Wait(); // Blocking call, which should be used with caution
-
-        if (responseTask.IsCompletedSuccessfully)
-        {
-            var response = responseTask.Result;
-
-            associatedProvinceList = JsonConvert.DeserializeObject<List<string>>(response);        
-        }
-        else
-        {
-            throw new Exception("Failed to get response.");
-        }
-    }
-
-    private void AddContactField(ContactValue item)
-    {
-        var newContactValue = new ContactValue { ContactTypeId = item.ContactTypeId, ContactTypeDescription = item.ContactTypeDescription, ContactDescription = "" };
-        contactValueList.Add(newContactValue);
-
-        // Reorder the list by ContactTypeId
-        contactValueList = contactValueList.OrderBy(x => x.ContactTypeId).ToList();
+        //Get User contact details, complete details mandatory
     }
 
     private async Task SubmitClaim()
-    {       
-        ShowErrors = false;
-
-        clubEntity.ClubStatusId = (int)Enums.ClubStatus.ClaimRequested;
-        clubEntity.CreatedByUserId = "1";
-        clubEntity.UpdatedByUserId = "1";
-
-        ClubEntityWithList clubEntityWL = new ClubEntityWithList()
-        {
-            clubEntity = clubEntity,
-            associatedProvinces = associatedProvinceList,
-            contactDetails = contactValueList
-        };
+    {
+        UserEntityRelationship userEntityRelationship = new UserEntityRelationship()
+            {
+                UserId = "1",//get user details
+                EntityTypeID = entityTypeId,
+                EntityId = clubEntity.ClubEntityId,
+                RoleTypeId = (int)Enums.RoleType.OwnerPendingVerification
+            };
 
         var result = "";
 
-        if (clubEntity.ClubEntityId == 0)
-        {
-            result = await EntityTypeService.AddClubEntity(clubEntityWL);
-        }
-        else
-        {
-            result = await EntityTypeService.UpdateClubEntity(clubEntityWL);
-        }
+        result = await EntityTypeService.AddUserEntityRelationship(userEntityRelationship);
+
         #region error handling section
         if (result == "")
         {
@@ -237,7 +113,7 @@
             ShowErrors = true;
             _processing = false;
         }
-        #endregion 
+        #endregion
     }
 
     private void CancelClaim()
@@ -252,6 +128,6 @@
     private bool _processing = false;
     async Task ProcessSomething()
     {
-        _processing = true;       
+        _processing = true;
     }
 }

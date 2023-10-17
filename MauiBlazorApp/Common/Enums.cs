@@ -20,5 +20,16 @@
             Disabled = 4,
             Suspended = 5
         }
+
+        public enum RoleType
+        {
+            SuperUser = 1,
+            Admin = 2,
+            Proxy = 3,
+            Minor = 4,
+            OwnerPendingVerification = 5,
+            OwnerVerified = 6
+
+        }
     }
 }

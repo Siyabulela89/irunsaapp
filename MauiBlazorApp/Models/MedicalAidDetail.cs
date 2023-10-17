@@ -9,7 +9,7 @@ namespace irunsaapp.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MedicalAidDetailId { get; set; }
         public int EntityTypeID { get; set; }
-        public int EntiyId { get; set; }
+        public int EntityId { get; set; }
         public int MedicalAidId { get; set; }
         public int Dependants { get; set; }
         public DateTime JoinedDate { get; set; }

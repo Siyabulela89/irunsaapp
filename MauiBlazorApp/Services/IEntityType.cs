@@ -18,5 +18,6 @@ namespace irunsaapp.Services
         List<ContactDetail> GetSavedContacts(int entityTypeId, int clubEntityId);
         Task<string> AddClubEntity(ClubEntityWithList clubEntity);
         Task<string> UpdateClubEntity(ClubEntityWithList clubEntity);
+        Task<string> AddUserEntityRelationship(UserEntityRelationship model);
     }
 }

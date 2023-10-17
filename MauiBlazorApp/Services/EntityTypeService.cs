@@ -178,5 +178,30 @@ namespace irunsaapp.Services
             }
         }
 
+        public async Task<string> AddUserEntityRelationship(UserEntityRelationship model)
+        {
+            try
+            {
+                var modelAsJson = JsonSerializer.Serialize(model);
+                var content = new StringContent(modelAsJson, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("api/ClubEntity/AddUserEntityRelationship", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"Failed to add UserEntityRelationship. StatusCode: {response.StatusCode}. Content: {errorContent}");
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return responseContent;
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (log, rethrow, etc.)
+                throw new ApplicationException("Failed to add UserEntityRelationship.", ex);
+            }
+        }
+
     }
 }

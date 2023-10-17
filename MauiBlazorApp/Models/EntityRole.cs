@@ -9,7 +9,7 @@ namespace irunsaapp.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EntityRoleId { get; set; }
         public int RoleTypeId { get; set; }
-        public int EntiyId { get; set; }
+        public int EntityId { get; set; }
         public bool HasAccess { get; set; }
     }
 }

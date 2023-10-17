@@ -381,7 +381,7 @@
             userentityrelationship.UpdateDate = DateTime.Now;
             userentityrelationship.CreateDate = DateTime.Now;
             userentityrelationship.UserId = user.FindFirst(ClaimTypes.Actor)?.Value;
-            userentityrelationship.EntiyId = athleteEntityId;
+            userentityrelationship.EntityId = athleteEntityId;
 
 
             // Handle the attachment if a file is selected
